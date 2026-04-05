@@ -35,7 +35,7 @@ export default function AdminInvitesPage() {
 
   return (
     <div>
-      <div className="mb-8"><h1 className="text-3xl font-headline font-bold text-on-surface tracking-tight">Convites</h1><p className="mt-1 text-sm text-on-surface-variant/60">Gere links de convite para novos usuarios</p></div>
+      <div className="mb-8"><h1 className="text-3xl font-headline font-bold text-on-surface tracking-tight">Convites</h1><p className="mt-1 text-sm text-on-surface-variant/60">Gere links de convite para novos usuários</p></div>
       <div className="card mb-6">
         <h3 className="text-sm font-semibold text-on-surface mb-4">Gerar novo convite</h3>
         <div className="flex flex-wrap items-end gap-4 mb-4">

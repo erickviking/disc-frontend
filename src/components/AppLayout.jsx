@@ -5,14 +5,14 @@ import { LayoutDashboard, Users, Wrench, Link2, ClipboardList, LogOut, Menu, X, 
 
 const adminNav = [
   { to: '/admin', icon: LayoutDashboard, label: 'Dashboard', end: true },
-  { to: '/admin/users', icon: Users, label: 'Usuarios' },
+  { to: '/admin/users', icon: Users, label: 'Usuários' },
   { to: '/admin/tools', icon: Wrench, label: 'Ferramentas' },
   { to: '/admin/invites', icon: Link2, label: 'Convites' },
   { to: '/admin/assessments', icon: ClipboardList, label: 'Assessments' },
 ];
 const userNav = [
   { to: '/dashboard', icon: LayoutDashboard, label: 'Inicio', end: true },
-  { to: '/dashboard/assessments', icon: ClipboardList, label: 'Minhas Avaliacoes' },
+  { to: '/dashboard/assessments', icon: ClipboardList, label: 'Minhas Avaliações' },
 ];
 
 export function AppLayout() {

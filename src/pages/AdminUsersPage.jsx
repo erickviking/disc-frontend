@@ -58,8 +58,8 @@ export default function AdminUsersPage() {
     <div>
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-headline font-bold text-on-surface tracking-tight">Usuarios</h1>
-          <p className="mt-1 text-sm text-on-surface-variant/60">{pag.total} usuario{pag.total!==1?'s':''} cadastrado{pag.total!==1?'s':''}</p>
+          <h1 className="text-3xl font-headline font-bold text-on-surface tracking-tight">Usuários</h1>
+          <p className="mt-1 text-sm text-on-surface-variant/60">{pag.total} usuário{pag.total!==1?'s':''} cadastrado{pag.total!==1?'s':''}</p>
         </div>
         <button onClick={()=>setShowCreate(true)} className="btn-primary gap-2"><Plus size={16}/>Novo Usuario</button>
       </div>
@@ -70,7 +70,7 @@ export default function AdminUsersPage() {
             <thead><tr className="border-b border-outline-variant/10"><th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider text-on-surface-variant/50">Nome</th><th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider text-on-surface-variant/50">Email</th><th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider text-on-surface-variant/50">Papel</th><th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider text-on-surface-variant/50">Status</th><th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider text-on-surface-variant/50">Testes</th><th className="px-5 py-4 text-right text-xs font-semibold uppercase tracking-wider text-on-surface-variant/50">Acoes</th></tr></thead>
             <tbody className="divide-y divide-outline-variant/5">
               {loading ? <tr><td colSpan={6} className="px-5 py-12 text-center text-on-surface-variant/40"><div className="flex items-center justify-center gap-2"><div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent"/>Carregando...</div></td></tr>
-              : users.length===0 ? <tr><td colSpan={6} className="px-5 py-12 text-center text-on-surface-variant/40">Nenhum usuario encontrado</td></tr>
+              : users.length===0 ? <tr><td colSpan={6} className="px-5 py-12 text-center text-on-surface-variant/40">Nenhum usuário encontrado</td></tr>
               : users.map(u=>(
                 <tr key={u.id} className="hover:bg-surface-container-high/50 transition-colors">
                   <td className="px-5 py-4"><div className="flex items-center gap-3"><div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/15 text-xs font-bold text-primary">{(u.name||'?')[0].toUpperCase()}</div><span className="font-medium text-on-surface">{u.name}</span></div></td>

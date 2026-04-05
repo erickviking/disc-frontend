@@ -9,7 +9,7 @@ const statusLabels = {
   COMPLETED: { text: 'Completado', color: 'bg-blue-500/15 text-blue-400' },
   REVIEWED: { text: 'Revisado', color: 'bg-purple-500/15 text-purple-400' },
   RELEASED: { text: 'Liberado', color: 'bg-emerald-500/15 text-emerald-400' },
-  REPORT_GENERATED: { text: 'Relatorio gerado', color: 'bg-primary/15 text-primary' },
+  REPORT_GENERATED: { text: 'Relatório gerado', color: 'bg-primary/15 text-primary' },
 };
 
 export default function AdminAssessmentsPage() {
@@ -26,7 +26,7 @@ export default function AdminAssessmentsPage() {
   useEffect(() => { load(); }, []);
 
   const release = async (id) => { setReleasing(id); try { await api.patch('/admin/assessments/'+id+'/release', {adminNotes:adminNotes||undefined}); setAdminNotes(''); await load(); } catch(e){alert(e.message);} finally{setReleasing(null);} };
-  const generateReport = async (id) => { setGenerating(id); try { const r = await api.post('/admin/assessments/'+id+'/generate-report', {}); alert(r.message||'Relatorio gerado!'); await load(); } catch(e){alert('Erro: '+e.message);} finally{setGenerating(null);} };
+  const generateReport = async (id) => { setGenerating(id); try { const r = await api.post('/admin/assessments/'+id+'/generate-report', {}); alert(r.message||'Relatório gerado!'); await load(); } catch(e){alert('Erro: '+e.message);} finally{setGenerating(null);} };
   const deleteAssessment = async (id) => { if (!confirm('Deletar este assessment?')) return; setDeleting(id); try { await api.delete('/admin/assessments/'+id); setExpanded(null); await load(); } catch(e){alert(e.message);} finally{setDeleting(null);} };
   const fmtDate = (d) => new Date(d).toLocaleDateString('pt-BR', {day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'});
 
@@ -59,8 +59,8 @@ export default function AdminAssessmentsPage() {
                 <div className="border-t border-outline-variant/10 p-5 bg-surface-container-low/50">
                   {scores&&(<div className="mb-5"><h4 className="text-sm font-semibold text-on-surface mb-3">Perfil Comportamental</h4><div className="grid grid-cols-4 gap-3">{['D','I','S','C'].map(f=>{const colors={D:'bg-disc-d',I:'bg-disc-i',S:'bg-disc-s',C:'bg-disc-c'};return(<div key={f}><div className="flex justify-between text-xs mb-1"><span className="text-on-surface-variant/70">{profileNames[f]}</span><span className="font-semibold text-on-surface">{scores[f]}%</span></div><div className="h-2 rounded-full bg-surface-container-highest"><div className={"h-full rounded-full "+colors[f]} style={{width:scores[f]+'%'}}/></div></div>);})}</div>{a.profilePrimary&&<p className="mt-3 text-sm text-on-surface-variant/70">Perfil: <span className="font-semibold text-on-surface">{profileNames[a.profilePrimary]} / {profileNames[a.profileSecondary]}</span></p>}</div>)}
                   <div className="flex flex-wrap gap-3 mb-4">
-                    {hasReport&&<button onClick={(e)=>{e.stopPropagation();navigate('/report/'+a.id);}} className="btn-primary gap-2"><Eye size={14}/>Ver Relatorio</button>}
-                    {canGenerate&&<button onClick={(e)=>{e.stopPropagation();generateReport(a.id);}} disabled={generating===a.id} className="btn-primary gap-2">{generating===a.id?<Loader2 size={14} className="animate-spin"/>:<FileText size={14}/>}Gerar Relatorio</button>}
+                    {hasReport&&<button onClick={(e)=>{e.stopPropagation();navigate('/report/'+a.id);}} className="btn-primary gap-2"><Eye size={14}/>Ver Relatório</button>}
+                    {canGenerate&&<button onClick={(e)=>{e.stopPropagation();generateReport(a.id);}} disabled={generating===a.id} className="btn-primary gap-2">{generating===a.id?<Loader2 size={14} className="animate-spin"/>:<FileText size={14}/>}Gerar Relatório</button>}
                   </div>
                   {canRelease&&(<div className="border-t border-outline-variant/10 pt-4 mb-4"><h4 className="text-sm font-semibold text-on-surface mb-2">Liberar Assessment</h4><textarea className="input-field mb-3" rows={2} placeholder="Nota para a IA (opcional)..." value={adminNotes} onChange={e=>setAdminNotes(e.target.value)}/><button onClick={()=>release(a.id)} disabled={releasing===a.id} className="btn-primary gap-2">{releasing===a.id?<Loader2 size={14} className="animate-spin"/>:<Unlock size={14}/>}Liberar</button></div>)}
                   {a.releasedAt&&<p className="text-xs text-emerald-400 mt-2">Liberado em {fmtDate(a.releasedAt)}</p>}

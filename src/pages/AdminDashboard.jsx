@@ -30,9 +30,9 @@ export default function AdminDashboard() {
   const greeting = () => { const h = new Date().getHours(); return h < 12 ? 'Bom dia' : h < 18 ? 'Boa tarde' : 'Boa noite'; };
 
   const cards = [
-    { label: 'Usuarios', value: stats?.totalUsers || 0, icon: Users, img: '/card-roda.jpg', route: '/admin/users', desc: 'Gerenciar usuarios e acessos' },
+    { label: 'Usuários', value: stats?.totalUsers || 0, icon: Users, img: '/card-roda.jpg', route: '/admin/users', desc: 'Gerenciar usuários e acessos' },
     { label: 'Assessments', value: stats?.totalAssessments || 0, icon: ClipboardList, img: '/card-disc.jpg', route: '/admin/assessments', desc: 'Testes comportamentais realizados' },
-    { label: 'Relatorios', value: stats?.totalReports || 0, icon: FileText, img: '/card-ie.jpg', route: '/admin/assessments', desc: 'Relatorios gerados por IA' },
+    { label: 'Relatórios', value: stats?.totalReports || 0, icon: FileText, img: '/card-ie.jpg', route: '/admin/assessments', desc: 'Relatórios gerados por IA' },
     { label: 'Ferramentas', value: '7', icon: Wrench, img: '/card-valores.jpg', route: '/admin/tools', desc: 'Gerenciar ferramentas e acesso' },
   ];
 
