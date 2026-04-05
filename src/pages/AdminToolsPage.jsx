@@ -20,6 +20,19 @@ const cardImages = {
   'diario': '/card-diario.jpg',
 };
 
+// Posição do rosto da Vanessa em cada foto (analisado manualmente)
+const cardFocusPoint = {
+  'disc': 'center 15%',
+  'roda-da-vida': 'center 10%',
+  'inteligencia-emocional': 'center 25%',
+  'inteligência-emocional': 'center 25%',
+  'valores-pessoais': 'center 15%',
+  'metas-smart': 'center 30%',
+  'sabotadores': 'center 20%',
+  'diário': 'center 12%',
+  'diario': 'center 12%',
+};
+
 export default function AdminToolsPage() {
   const [tools, setTools] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -133,6 +146,7 @@ export default function AdminToolsPage() {
         {tools.sort((a, b) => a.sortOrder - b.sortOrder).map(tool => {
           const Icon = iconMap[tool.icon] || Target;
           const bgImage = cardImages[tool.slug];
+          const focusPoint = cardFocusPoint[tool.slug] || 'center 20%';
           const users = toolUsers[tool.id] || [];
           const usersWithout = allUsers.filter(u => !u.isAdmin && !users.find(tu => tu.id === u.id));
           const isExpanded = expanded === tool.id;
@@ -140,22 +154,25 @@ export default function AdminToolsPage() {
           const assessmentCount = tool._count?.assessments || 0;
 
           return (
-            <div key={tool.id} className="group flex flex-col rounded-2xl overflow-hidden bg-surface-container border border-outline-variant/30 transition-all duration-300 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5">
+            <div key={tool.id} onClick={() => handleExpand(tool.id)}
+              className="group flex flex-col rounded-2xl overflow-hidden bg-surface-container border border-outline-variant/30 cursor-pointer transition-all duration-300 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5">
               
               {/* Card Image Header */}
-              <div className="relative h-44 overflow-hidden">
+              <div className="relative h-48 overflow-hidden">
                 {bgImage ? (
                   <img
                     src={bgImage}
                     alt=""
-                    className={`absolute inset-0 w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105 ${!tool.isActive ? 'grayscale opacity-50' : ''}`}
+                    style={{ objectPosition: focusPoint }}
+                    className={`absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 ${!tool.isActive ? 'grayscale opacity-50' : ''}`}
                   />
                 ) : (
                   <div className="absolute inset-0" style={{ background: `linear-gradient(135deg, ${tool.color}33, ${tool.color}11)` }} />
                 )}
                 
                 {/* Overlay gradiente */}
-                <div className="absolute inset-0 bg-gradient-to-t from-surface-container via-surface-container/60 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-surface-container from-5% via-surface-container/70 via-40% to-surface-container/20 to-100%" />
+                <div className="absolute inset-0 bg-gradient-to-r from-surface-container/30 via-transparent to-surface-container/30" />
                 
                 {/* Status badge */}
                 <div className="absolute top-3 right-3 flex items-center gap-1.5">
@@ -218,7 +235,7 @@ export default function AdminToolsPage() {
                 {/* Ações */}
                 <div className="flex items-center gap-2 pt-1">
                   <button
-                    onClick={() => toggleTool(tool)}
+                    onClick={(e) => { e.stopPropagation(); toggleTool(tool); }}
                     disabled={toggling === tool.id}
                     className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
                       tool.isActive
@@ -237,7 +254,7 @@ export default function AdminToolsPage() {
                   </button>
 
                   <button
-                    onClick={() => toggleDefault(tool)}
+                    onClick={(e) => { e.stopPropagation(); toggleDefault(tool); }}
                     className={`flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
                       tool.isDefault
                         ? 'bg-primary/10 text-primary'
@@ -261,7 +278,7 @@ export default function AdminToolsPage() {
 
               {/* Expandido: controle de acesso por usuário */}
               {isExpanded && (
-                <div className="border-t border-outline-variant/20 bg-surface-container-low p-4 space-y-4">
+                <div className="border-t border-outline-variant/20 bg-surface-container-low p-4 space-y-4" onClick={(e) => e.stopPropagation()}>
                   {/* Ações em massa */}
                   <div className="flex items-center justify-between">
                     <p className="text-xs font-semibold text-on-surface uppercase tracking-wider">Controle de acesso</p>
