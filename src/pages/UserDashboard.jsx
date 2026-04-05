@@ -18,6 +18,17 @@ const cardImages = {
   'diario': '/card-diario.jpg',
 };
 
+// Posição do rosto da Vanessa em cada foto
+const cardFocusPoint = {
+  'disc': 'center 15%',
+  'roda-da-vida': 'center 10%',
+  'inteligencia-emocional': 'center 25%',
+  'valores-pessoais': 'center 15%',
+  'metas-smart': 'center 30%',
+  'sabotadores': 'center 20%',
+  'diario': 'center 12%',
+};
+
 function getGreeting() {
   const h = new Date().getHours();
   if (h < 12) return 'Bom dia';
@@ -109,7 +120,7 @@ export default function UserDashboard() {
   const discStatus = discTool ? getStatus(discTool) : 'locked';
   const otherTools = tools.filter(t => t.slug !== 'disc');
 
-  const imgStyle = { objectPosition: 'center 20%' };
+  // objectPosition agora é por card via cardFocusPoint
 
   return (
     <div className="space-y-8">
@@ -136,8 +147,8 @@ export default function UserDashboard() {
           onClick={() => handleAction(discTool)}
         >
           <div className="relative min-h-[280px] flex flex-col justify-between p-8">
-            <img src="/card-disc.jpg" alt="" style={imgStyle} className="absolute inset-0 w-full h-full object-cover" />
-            <div className="absolute inset-0 bg-gradient-to-t from-surface via-surface/85 to-surface/50" />
+            <img src="/card-disc.jpg" alt="" style={{ objectPosition: cardFocusPoint['disc'] }} className="absolute inset-0 w-full h-full object-cover" />
+            <div className="absolute inset-0 bg-gradient-to-t from-surface from-10% via-surface/85 via-50% to-surface/40 to-100%" />
 
             <div className="relative z-10">
               <div className="flex justify-between items-start mb-6">
@@ -197,8 +208,8 @@ export default function UserDashboard() {
           onClick={() => handleAction(discTool)}
         >
           <div className="relative h-48">
-            <img src="/card-disc.jpg" alt="" style={imgStyle} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-            <div className="absolute inset-0 bg-gradient-to-t from-surface via-surface/70 to-transparent" />
+            <img src="/card-disc.jpg" alt="" style={{ objectPosition: cardFocusPoint['disc'] }} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+            <div className="absolute inset-0 bg-gradient-to-t from-surface from-5% via-surface/70 via-50% to-surface/30 to-100%" />
             <div className="absolute bottom-4 left-6 right-6 z-10">
               <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/20 backdrop-blur-sm text-primary text-xs font-bold uppercase tracking-widest mb-2">
                 {discStatus === 'in_progress' ? 'Em andamento' : 'Disponível'}
@@ -224,6 +235,7 @@ export default function UserDashboard() {
             const status = getStatus(tool);
             const isLocked = status === 'locked';
             const bgImage = cardImages[tool.slug];
+            const focusPoint = cardFocusPoint[tool.slug] || 'center 20%';
             const Icon = iconMap[tool.icon] || Target;
 
             return (
@@ -236,12 +248,12 @@ export default function UserDashboard() {
                 }`}
                 onClick={() => !isLocked && handleAction(tool)}
               >
-                <div className="relative h-44 overflow-hidden bg-surface-container">
+                <div className="relative h-48 overflow-hidden bg-surface-container">
                   {bgImage && (
                     <img
                       src={bgImage}
                       alt=""
-                      style={imgStyle}
+                      style={{ objectPosition: focusPoint }}
                       className={`absolute inset-0 w-full h-full object-cover transition-transform duration-500 ${
                         isLocked ? 'grayscale brightness-50 blur-[1px]' : 'group-hover:scale-105'
                       }`}
@@ -251,7 +263,7 @@ export default function UserDashboard() {
                   <div className={`absolute inset-0 ${
                     isLocked
                       ? 'bg-surface/60'
-                      : 'bg-gradient-to-t from-surface-container via-surface-container/70 to-surface-container/20'
+                      : 'bg-gradient-to-t from-surface-container from-5% via-surface-container/70 via-40% to-surface-container/20 to-100%'
                   }`} />
 
                   {isLocked && (
@@ -345,7 +357,7 @@ export default function UserDashboard() {
       {/* CTA Card */}
       <div className="relative rounded-2xl overflow-hidden bg-surface-container border border-outline-variant/20 p-8">
         <div className="absolute inset-0">
-          <img src="/card-cta.jpg" alt="" style={imgStyle} className="w-full h-full object-cover opacity-20" />
+          <img src="/card-cta.jpg" alt="" style={{ objectPosition: 'center 15%' }} className="w-full h-full object-cover opacity-20" />
           <div className="absolute inset-0 bg-gradient-to-r from-surface-container via-surface-container/90 to-surface-container/70" />
         </div>
         <div className="relative max-w-lg">
@@ -360,7 +372,7 @@ export default function UserDashboard() {
           </button>
         </div>
         <div className="absolute right-8 bottom-0 hidden lg:block">
-          <img src="/vanessa-hero.jpg" alt="" style={imgStyle} className="h-52 object-cover opacity-40 mix-blend-luminosity" />
+          <img src="/vanessa-hero.jpg" alt="" style={{ objectPosition: 'center 15%' }} className="h-52 object-cover opacity-40 mix-blend-luminosity" />
         </div>
       </div>
     </div>
