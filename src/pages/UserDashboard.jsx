@@ -32,7 +32,7 @@ export default function UserDashboard() {
   const [allTools, setAllTools] = useState([]);
   const [assessments, setAssessments] = useState([]);
   const [loading, setLoading] = useState(true);
-  const firstName = (user?.name || 'Usu\u00e1rio').split(' ')[0];
+  const firstName = (user?.name || '').split(' ')[0] || 'Usuário';
 
   useEffect(() => {
     const load = async () => {
@@ -51,7 +51,7 @@ export default function UserDashboard() {
     load();
   }, []);
 
-  // Build unified tool list: accessible + locked
+  // Build unified tool list
   const myToolIds = new Set(myTools.map(t => t.id));
   const tools = [
     ...myTools.map(t => ({ ...t, hasAccess: true })),
@@ -65,23 +65,35 @@ export default function UserDashboard() {
   const getStatus = (tool) => {
     if (!tool.hasAccess) return 'locked';
     const a = getAssessment(tool.slug);
-    if (!a) return 'available';
-    if (a.status === 'completed' && a.report) return 'completed';
-    if (a.status === 'completed' || (a.scoresRaw && a.status !== 'IN_PROGRESS')) return 'awaiting_report';
+    if (!a) {
+      // Fallback: check if any assessment exists (older data without tool relation)
+      const anyCompleted = assessments.find(ass => ass.scoresRaw && ass.status !== 'IN_PROGRESS');
+      if (tool.slug === 'disc' && anyCompleted) return 'completed';
+      return 'available';
+    }
+    if (a.scoresRaw && a.report) return 'completed';
+    if (a.scoresRaw) return 'awaiting_report';
     if (a.status === 'IN_PROGRESS') return 'in_progress';
     return 'available';
   };
 
+  const getDiscAssessment = () => {
+    // Try to find assessment linked to disc tool
+    const linked = assessments.find(a => a.tool?.slug === 'disc');
+    if (linked) return linked;
+    // Fallback: any completed assessment with scores (legacy data)
+    return assessments.find(a => a.scoresRaw && a.status !== 'IN_PROGRESS');
+  };
+
   const handleAction = (tool) => {
     const status = getStatus(tool);
-    const a = getAssessment(tool.slug);
     if (status === 'locked') return;
+    const a = tool.slug === 'disc' ? getDiscAssessment() : getAssessment(tool.slug);
     if (tool.slug === 'disc') {
       if (status === 'available') navigate('/dashboard/disc/start');
       else if (status === 'in_progress') navigate('/dashboard/disc/quiz');
-      else if (status === 'completed' && a) navigate('/dashboard/disc/report/' + a.id);
-      else if (status === 'completed' || status === 'awaiting_report') {
-        if (a) navigate('/report/' + a.id);
+      else if ((status === 'completed' || status === 'awaiting_report') && a) {
+        navigate('/report/' + a.id);
       }
     }
   };
@@ -92,11 +104,12 @@ export default function UserDashboard() {
     </div>
   );
 
-  // Separate DISC (hero) from others
   const discTool = tools.find(t => t.slug === 'disc');
-  const discAssessment = discTool ? getAssessment('disc') : null;
+  const discAssessment = getDiscAssessment();
   const discStatus = discTool ? getStatus(discTool) : 'locked';
   const otherTools = tools.filter(t => t.slug !== 'disc');
+
+  const imgStyle = { objectPosition: 'center 20%' };
 
   return (
     <div className="space-y-8">
@@ -111,36 +124,34 @@ export default function UserDashboard() {
             {firstName}
           </h1>
           <p className="mt-2 text-sm text-on-surface-variant max-w-md">
-            Explore suas ferramentas de desenvolvimento pessoal e descubra mais sobre voc\u00ea.
+            Explore suas ferramentas de desenvolvimento pessoal e descubra mais sobre você.
           </p>
         </div>
       </div>
 
-      {/* DISC Hero Card */}
+      {/* DISC Hero Card — Completed */}
       {discTool && discStatus === 'completed' && discAssessment && (
         <div
           className="group relative rounded-2xl overflow-hidden border border-outline-variant/20 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 cursor-pointer"
           onClick={() => handleAction(discTool)}
         >
-          <div className="relative h-auto min-h-[280px] flex flex-col justify-between p-8">
-            {/* Background image */}
-            <img src="/card-disc.jpg" alt="" className="absolute inset-0 w-full h-full object-cover object-top" />
+          <div className="relative min-h-[280px] flex flex-col justify-between p-8">
+            <img src="/card-disc.jpg" alt="" style={imgStyle} className="absolute inset-0 w-full h-full object-cover" />
             <div className="absolute inset-0 bg-gradient-to-t from-surface via-surface/85 to-surface/50" />
 
             <div className="relative z-10">
               <div className="flex justify-between items-start mb-6">
                 <div>
                   <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/15 text-emerald-400 text-xs font-bold uppercase tracking-widest">
-                    <span className="w-2 h-2 rounded-full bg-emerald-400" /> Conclu\u00eddo
+                    <span className="w-2 h-2 rounded-full bg-emerald-400" /> Concluído
                   </span>
                   <h3 className="mt-3 text-2xl lg:text-3xl font-headline font-bold text-on-surface tracking-tight">
-                    An\u00e1lise Comportamental DISC
+                    Análise Comportamental DISC
                   </h3>
                 </div>
                 <CheckCircle2 size={32} className="text-primary" />
               </div>
 
-              {/* Scores */}
               {discAssessment?.scoresRaw?.normalized && (
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-2xl mb-4">
                   {['D', 'I', 'S', 'C'].map(dim => {
@@ -162,7 +173,7 @@ export default function UserDashboard() {
 
               <div className="flex items-center justify-between">
                 <span className="text-xs text-on-surface-variant">
-                  Perfil: {discAssessment?.scoresRaw?.normalized ? 
+                  Perfil: {discAssessment?.scoresRaw?.normalized ?
                     Object.entries(discAssessment.scoresRaw.normalized)
                       .sort((a, b) => b[1] - a[1])
                       .slice(0, 2)
@@ -171,7 +182,7 @@ export default function UserDashboard() {
                     : ''}
                 </span>
                 <button className="flex items-center gap-2 text-xs font-bold text-primary uppercase tracking-widest hover:text-gold-200 transition-colors">
-                  Ver relat\u00f3rio completo <ArrowRight size={14} />
+                  Ver relatório completo <ArrowRight size={14} />
                 </button>
               </div>
             </div>
@@ -179,23 +190,23 @@ export default function UserDashboard() {
         </div>
       )}
 
-      {/* DISC available or in progress */}
+      {/* DISC — Available or In Progress */}
       {discTool && (discStatus === 'available' || discStatus === 'in_progress') && (
         <div
           className="group relative rounded-2xl overflow-hidden border border-outline-variant/20 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 cursor-pointer"
           onClick={() => handleAction(discTool)}
         >
           <div className="relative h-48">
-            <img src="/card-disc.jpg" alt="" className="absolute inset-0 w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500" />
+            <img src="/card-disc.jpg" alt="" style={imgStyle} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
             <div className="absolute inset-0 bg-gradient-to-t from-surface via-surface/70 to-transparent" />
             <div className="absolute bottom-4 left-6 right-6 z-10">
               <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/20 backdrop-blur-sm text-primary text-xs font-bold uppercase tracking-widest mb-2">
-                {discStatus === 'in_progress' ? 'Em andamento' : 'Dispon\u00edvel'}
+                {discStatus === 'in_progress' ? 'Em andamento' : 'Disponível'}
               </span>
-              <h3 className="text-2xl font-headline font-bold text-on-surface">An\u00e1lise DISC</h3>
+              <h3 className="text-2xl font-headline font-bold text-on-surface">Análise DISC</h3>
             </div>
           </div>
-          <div className="p-6">
+          <div className="p-6 bg-surface-container">
             <p className="text-sm text-on-surface-variant mb-4">{discTool.description}</p>
             <button className="flex items-center gap-2 rounded-xl bg-primary/10 px-5 py-2.5 text-xs font-bold text-primary uppercase tracking-widest hover:bg-primary/20 transition-colors">
               {discStatus === 'in_progress' ? 'Continuar' : 'Iniciar'} <ArrowRight size={14} />
@@ -204,11 +215,9 @@ export default function UserDashboard() {
         </div>
       )}
 
-      {/* Other Tools Grid */}
+      {/* Other Tools */}
       <div>
-        <h2 className="font-headline text-lg font-semibold text-on-surface mb-4">
-          Suas ferramentas
-        </h2>
+        <h2 className="font-headline text-lg font-semibold text-on-surface mb-4">Suas ferramentas</h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {otherTools.map(tool => {
@@ -227,26 +236,24 @@ export default function UserDashboard() {
                 }`}
                 onClick={() => !isLocked && handleAction(tool)}
               >
-                {/* Image */}
                 <div className="relative h-44 overflow-hidden bg-surface-container">
                   {bgImage && (
                     <img
                       src={bgImage}
                       alt=""
-                      className={`absolute inset-0 w-full h-full object-cover object-top transition-transform duration-500 ${
+                      style={imgStyle}
+                      className={`absolute inset-0 w-full h-full object-cover transition-transform duration-500 ${
                         isLocked ? 'grayscale brightness-50 blur-[1px]' : 'group-hover:scale-105'
                       }`}
                     />
                   )}
 
-                  {/* Overlay */}
                   <div className={`absolute inset-0 ${
                     isLocked
-                      ? 'bg-surface/70'
-                      : 'bg-gradient-to-t from-surface-container via-surface-container/40 to-transparent'
+                      ? 'bg-surface/60'
+                      : 'bg-gradient-to-t from-surface-container via-surface-container/70 to-surface-container/20'
                   }`} />
 
-                  {/* Lock */}
                   {isLocked && (
                     <div className="absolute inset-0 flex items-center justify-center z-10">
                       <div className="flex flex-col items-center gap-2">
@@ -260,16 +267,15 @@ export default function UserDashboard() {
                     </div>
                   )}
 
-                  {/* Status badge */}
                   {!isLocked && (
                     <div className="absolute top-3 right-3 z-10">
                       {status === 'completed' ? (
                         <span className="flex items-center gap-1 rounded-full bg-emerald-500/20 backdrop-blur-sm px-2.5 py-1 text-xs font-medium text-emerald-400 border border-emerald-500/20">
-                          <CheckCircle2 size={10} /> Conclu\u00eddo
+                          <CheckCircle2 size={10} /> Concluído
                         </span>
                       ) : status === 'awaiting_report' ? (
                         <span className="flex items-center gap-1 rounded-full bg-amber-500/20 backdrop-blur-sm px-2.5 py-1 text-xs font-medium text-amber-400 border border-amber-500/20">
-                          <Clock size={10} /> Aguardando relat\u00f3rio
+                          <Clock size={10} /> Aguardando relatório
                         </span>
                       ) : status === 'in_progress' ? (
                         <span className="flex items-center gap-1 rounded-full bg-blue-500/20 backdrop-blur-sm px-2.5 py-1 text-xs font-medium text-blue-400 border border-blue-500/20">
@@ -277,13 +283,12 @@ export default function UserDashboard() {
                         </span>
                       ) : (
                         <span className="flex items-center gap-1 rounded-full bg-primary/20 backdrop-blur-sm px-2.5 py-1 text-xs font-medium text-primary border border-primary/20">
-                          Dispon\u00edvel
+                          Disponível
                         </span>
                       )}
                     </div>
                   )}
 
-                  {/* Icon */}
                   {!isLocked && (
                     <div className="absolute bottom-3 left-4 z-10">
                       <div
@@ -296,7 +301,6 @@ export default function UserDashboard() {
                   )}
                 </div>
 
-                {/* Body */}
                 <div className="flex-1 p-5 pt-3 bg-surface-container space-y-3">
                   <div>
                     <h3 className={`font-headline text-base font-bold ${isLocked ? 'text-on-surface-variant/70' : 'text-on-surface'}`}>
@@ -307,7 +311,6 @@ export default function UserDashboard() {
                     </p>
                   </div>
 
-                  {/* Action */}
                   {!isLocked && (
                     <div>
                       {status === 'available' && (
@@ -322,12 +325,12 @@ export default function UserDashboard() {
                       )}
                       {status === 'completed' && (
                         <button className="flex items-center gap-2 rounded-xl bg-emerald-500/10 px-4 py-2 text-xs font-semibold text-emerald-400 hover:bg-emerald-500/20 transition-colors w-full justify-center">
-                          Ver relat\u00f3rio <ArrowRight size={14} />
+                          Ver relatório <ArrowRight size={14} />
                         </button>
                       )}
                       {status === 'awaiting_report' && (
                         <div className="flex items-center gap-2 rounded-xl bg-amber-500/5 px-4 py-2 text-xs text-amber-400/70 w-full justify-center">
-                          <Clock size={12} /> Relat\u00f3rio sendo preparado
+                          <Clock size={12} /> Relatório sendo preparado
                         </div>
                       )}
                     </div>
@@ -342,7 +345,7 @@ export default function UserDashboard() {
       {/* CTA Card */}
       <div className="relative rounded-2xl overflow-hidden bg-surface-container border border-outline-variant/20 p-8">
         <div className="absolute inset-0">
-          <img src="/card-cta.jpg" alt="" className="w-full h-full object-cover object-top opacity-20" />
+          <img src="/card-cta.jpg" alt="" style={imgStyle} className="w-full h-full object-cover opacity-20" />
           <div className="absolute inset-0 bg-gradient-to-r from-surface-container via-surface-container/90 to-surface-container/70" />
         </div>
         <div className="relative max-w-lg">
@@ -350,14 +353,14 @@ export default function UserDashboard() {
             Quer ir mais fundo?
           </h3>
           <p className="mt-2 text-sm text-on-surface-variant leading-relaxed">
-            Que tal agendar uma sess\u00e3o de devolutiva para explorar seus resultados?
+            Que tal agendar uma sessão de devolutiva para explorar seus resultados?
           </p>
           <button className="mt-4 flex items-center gap-2 rounded-xl bg-primary px-6 py-2.5 text-xs font-bold text-on-primary uppercase tracking-widest hover:bg-primary/90 transition-colors shadow-lg">
-            Solicitar sess\u00e3o <ArrowRight size={14} />
+            Solicitar sessão <ArrowRight size={14} />
           </button>
         </div>
         <div className="absolute right-8 bottom-0 hidden lg:block">
-          <img src="/vanessa-hero.jpg" alt="" className="h-52 object-cover object-top opacity-40 mix-blend-luminosity" />
+          <img src="/vanessa-hero.jpg" alt="" style={imgStyle} className="h-52 object-cover opacity-40 mix-blend-luminosity" />
         </div>
       </div>
     </div>
