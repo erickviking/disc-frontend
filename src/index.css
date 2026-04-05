@@ -5,8 +5,8 @@
 @layer base {
   body {
     font-family: 'Manrope', sans-serif;
-    background-color: #131313;
-    color: #e5e2e1;
+    background-color: #0f0f0f;
+    color: #ededed;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
@@ -14,23 +14,23 @@
 
 @layer components {
   .btn-primary {
-    @apply inline-flex items-center justify-center rounded-xl bg-primary text-on-primary px-5 py-2.5 text-xs font-bold uppercase tracking-widest transition-all hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed;
+    @apply inline-flex items-center justify-center rounded-xl bg-primary text-on-primary px-5 py-2.5 text-xs font-bold uppercase tracking-widest transition-all hover:bg-gold-300 disabled:opacity-40 disabled:cursor-not-allowed;
   }
   .btn-secondary {
-    @apply inline-flex items-center justify-center rounded-xl border border-outline-variant/20 bg-surface-container px-5 py-2.5 text-xs font-bold uppercase tracking-widest text-on-surface-variant transition-all hover:bg-surface-container-high;
+    @apply inline-flex items-center justify-center rounded-xl border border-outline-variant/30 bg-surface-container px-5 py-2.5 text-xs font-bold uppercase tracking-widest text-on-surface-variant transition-all hover:bg-surface-container-high hover:border-outline-variant/50;
   }
   .btn-ghost {
     @apply inline-flex items-center justify-center rounded-xl px-5 py-2.5 text-xs font-bold uppercase tracking-widest text-primary transition-all hover:bg-surface-container;
   }
   .input-field {
-    @apply block w-full rounded-xl border border-outline-variant/20 bg-surface-container px-4 py-3 text-sm text-on-surface placeholder:text-on-surface-variant/50 focus:border-primary/50 focus:ring-2 focus:ring-primary/10 focus:outline-none transition-all;
+    @apply block w-full rounded-xl border border-outline-variant/30 bg-surface-container px-4 py-3 text-sm text-on-surface placeholder:text-on-surface-variant/40 focus:border-primary/50 focus:ring-2 focus:ring-primary/10 focus:outline-none transition-all;
   }
   .card {
-    @apply rounded-3xl border border-outline-variant/10 bg-surface-container p-6;
+    @apply rounded-3xl border border-outline-variant/15 bg-surface-container p-6;
   }
   .bg-glow {
-    background: radial-gradient(circle at top right, rgba(231, 190, 174, 0.04), transparent 50%),
-                radial-gradient(circle at bottom left, rgba(99, 113, 146, 0.03), transparent 50%);
+    background: radial-gradient(circle at top right, rgba(212, 168, 83, 0.03), transparent 50%),
+                radial-gradient(circle at bottom left, rgba(168, 184, 216, 0.02), transparent 50%);
   }
 }
 
