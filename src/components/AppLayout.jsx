@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext.jsx';
-import { LayoutDashboard, Users, Link2, ClipboardList, LogOut, Menu, X, ChevronRight } from 'lucide-react';
+import { LayoutDashboard, Users, Link2, ClipboardList, Wrench, LogOut, Menu, X, ChevronRight } from 'lucide-react';
 
 const adminNav = [
   { to: '/admin', icon: LayoutDashboard, label: 'Dashboard', end: true },
   { to: '/admin/users', icon: Users, label: 'Usuarios' },
+  { to: '/admin/tools', icon: Wrench, label: 'Ferramentas' },
   { to: '/admin/invites', icon: Link2, label: 'Convites' },
   { to: '/admin/assessments', icon: ClipboardList, label: 'Assessments' },
 ];
@@ -30,7 +31,7 @@ export function AppLayout() {
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-600 font-display text-sm text-white">VR</div>
           <div>
             <p className="font-display text-base leading-none text-brand-950">Vanessa Rocha</p>
-            <p className="text-[10px] font-medium uppercase tracking-widest text-gray-400">Analise DISC</p>
+            <p className="text-[10px] font-medium uppercase tracking-widest text-gray-400">Desenvolvimento Pessoal</p>
           </div>
           <button className="ml-auto rounded-lg p-1 text-gray-400 hover:bg-gray-100 lg:hidden" onClick={() => setOpen(false)}><X size={20} /></button>
         </div>

@@ -8,6 +8,7 @@ import AdminDashboard from './pages/AdminDashboard.jsx';
 import AdminUsersPage from './pages/AdminUsersPage.jsx';
 import AdminInvitesPage from './pages/AdminInvitesPage.jsx';
 import AdminAssessmentsPage from './pages/AdminAssessmentsPage.jsx';
+import AdminToolsPage from './pages/AdminToolsPage.jsx';
 import UserDashboard from './pages/UserDashboard.jsx';
 import UserAssessmentsPage from './pages/UserAssessmentsPage.jsx';
 import QuizPage from './pages/QuizPage.jsx';
@@ -33,6 +34,7 @@ export default function App() {
           <Route path="/admin" element={<ProtectedRoute requireAdmin><AppLayout /></ProtectedRoute>}>
             <Route index element={<AdminDashboard />} />
             <Route path="users" element={<AdminUsersPage />} />
+            <Route path="tools" element={<AdminToolsPage />} />
             <Route path="invites" element={<AdminInvitesPage />} />
             <Route path="assessments" element={<AdminAssessmentsPage />} />
           </Route>
