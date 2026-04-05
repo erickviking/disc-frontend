@@ -1,4 +1,24 @@
-import { useState, useEffect } from 'react';
+const fs = require('fs');
+const path = require('path');
+function w(f, c) {
+  const d = path.dirname(f);
+  if (!fs.existsSync(d)) fs.mkdirSync(d, { recursive: true });
+  fs.writeFileSync(f, c, 'utf8');
+  console.log('OK:', f);
+}
+
+// Card image mapping per tool slug
+const cardImages = {
+  'disc': '/card-disc.jpg',
+  'roda-da-vida': '/card-roda.jpg',
+  'inteligencia-emocional': '/card-ie.jpg',
+  'valores-pessoais': '/card-valores.jpg',
+  'metas-smart': '/card-metas.jpg',
+  'sabotadores': '/card-sabotadores.jpg',
+  'diario': '/card-diario.jpg',
+};
+
+w('../frontend/src/pages/UserDashboard.jsx', `import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext.jsx';
 import { api } from '../lib/api.js';
@@ -282,3 +302,21 @@ export default function UserDashboard() {
     </div>
   );
 }
+`);
+
+console.log('\\n============================================');
+console.log('  Dashboard Netflix com fotos aplicado!');
+console.log('============================================');
+console.log('\\nIMPORTANTE: Copie TODAS as imagens para');
+console.log('C:\\disc-system\\frontend\\public\\:');
+console.log('  card-disc.jpg');
+console.log('  card-roda.jpg');
+console.log('  card-ie.jpg');
+console.log('  card-valores.jpg');
+console.log('  card-metas.jpg');
+console.log('  card-sabotadores.jpg');
+console.log('  card-diario.jpg');
+console.log('  card-cta.jpg');
+console.log('  vanessa-profile.jpg');
+console.log('  vanessa-hero.jpg');
+console.log('\\nDepois git push para deploy.');
