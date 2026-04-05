@@ -40,7 +40,7 @@ export default function UserDashboard() {
         const [myData, allData, assessData] = await Promise.all([
           api.get('/tools').catch(() => ({ tools: [] })),
           api.get('/tools/all').catch(() => ({ tools: [] })),
-          api.get('/assessments/my').catch(() => ({ assessments: [] })),
+          api.get('/assessments/mine').catch(() => ({ assessments: [] })),
         ]);
         setMyTools(myData.tools || []);
         setAllTools(allData.tools || []);
