@@ -148,7 +148,7 @@ export default function AdminToolsPage() {
                   <img
                     src={bgImage}
                     alt=""
-                    className={`absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 ${!tool.isActive ? 'grayscale opacity-50' : ''}`}
+                    className={`absolute inset-0 w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105 ${!tool.isActive ? 'grayscale opacity-50' : ''}`}
                   />
                 ) : (
                   <div className="absolute inset-0" style={{ background: `linear-gradient(135deg, ${tool.color}33, ${tool.color}11)` }} />

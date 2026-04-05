@@ -82,8 +82,8 @@ export default function AdminDashboard() {
           <div className="p-8 flex items-center justify-between">
             <div>
               <p className="text-primary text-xs font-bold uppercase tracking-widest mb-2">Atencao</p>
-              <p className="text-lg font-headline text-on-surface">{stats.pendingRelease} assessment{stats.pendingRelease > 1 ? 's' : ''} aguardando liberacao</p>
-              <p className="text-sm text-on-surface-variant/60 mt-1">Revise e libere para gerar os relatorios.</p>
+              <p className="text-lg font-headline text-on-surface">{stats.pendingRelease} assessment{stats.pendingRelease > 1 ? 's' : ''} aguardando liberação</p>
+              <p className="text-sm text-on-surface-variant/60 mt-1">Revise e libere para gerar os relatórios.</p>
             </div>
             <button onClick={() => navigate('/admin/assessments')} className="btn-primary gap-2">
               Revisar <ArrowRight size={14} />

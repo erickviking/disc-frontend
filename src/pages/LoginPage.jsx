@@ -36,7 +36,7 @@ export default function LoginPage() {
             Descubra seu perfil<br /><span className="italic font-normal text-primary">comportamental</span>
           </h1>
           <p className="text-on-surface-variant/70 text-sm leading-relaxed max-w-md">
-            Uma plataforma premium de analise comportamental e desenvolvimento pessoal com inteligencia artificial.
+            Uma plataforma premium de análise comportamental e desenvolvimento pessoal com inteligência artificial.
           </p>
 
           <div className="mt-12 space-y-4 max-w-xs">
@@ -82,7 +82,7 @@ export default function LoginPage() {
               {loading?<div className="h-4 w-4 animate-spin rounded-full border-2 border-on-primary border-t-transparent"/>:<>Entrar <ArrowRight size={14}/></>}
             </button>
           </div>
-          <p className="mt-8 text-center text-sm text-on-surface-variant/50">Nao tem uma conta? <Link to="/register" className="font-semibold text-primary hover:text-gold-300">Cadastre-se</Link></p>
+          <p className="mt-8 text-center text-sm text-on-surface-variant/50">Não tem uma conta? <Link to="/register" className="font-semibold text-primary hover:text-gold-300">Cadastre-se</Link></p>
         </div>
       </div>
     </div>

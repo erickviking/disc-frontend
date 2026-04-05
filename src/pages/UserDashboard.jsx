@@ -151,7 +151,7 @@ export default function UserDashboard() {
                     <img
                       src={bgImage}
                       alt=""
-                      className={`absolute inset-0 w-full h-full object-cover transition-transform duration-500 ${
+                      className={`absolute inset-0 w-full h-full object-cover object-top transition-transform duration-500 ${
                         isLocked ? 'grayscale blur-[2px] opacity-40' : 'group-hover:scale-105'
                       }`}
                     />
