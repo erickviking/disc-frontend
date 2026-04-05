@@ -24,13 +24,13 @@ const cardImages = {
 const cardFocusPoint = {
   'disc': 'center 15%',
   'roda-da-vida': 'center 0%',
-  'inteligencia-emocional': 'center 10%',
-  'inteligência-emocional': 'center 10%',
-  'valores-pessoais': 'center 15%',
+  'inteligencia-emocional': 'center 40%',
+  'inteligência-emocional': 'center 40%',
+  'valores-pessoais': 'center 45%',
   'metas-smart': 'center 15%',
-  'sabotadores': 'center 5%',
-  'diário': 'center 12%',
-  'diario': 'center 12%',
+  'sabotadores': 'center 35%',
+  'diário': 'center 42%',
+  'diario': 'center 42%',
 };
 
 export default function AdminToolsPage() {

@@ -26,7 +26,7 @@ export default function LoginPage() {
         <div className="absolute inset-0 bg-glow" />
         <div className="absolute top-1/4 left-1/3 w-96 h-96 bg-primary/5 rounded-full blur-[120px]" />
         <div className="absolute bottom-0 right-0 w-[500px] h-[500px] overflow-hidden opacity-20">
-          <img src="/vanessa-hero.jpg" alt="" className="w-full h-full object-cover" />
+          <img src="/vanessa-hero.jpg" alt="" style={{ objectPosition: "center 15%" }} className="w-full h-full object-cover" />
         </div>
         <div className="relative z-10 flex flex-col justify-center px-16">
           <p className="text-4xl font-headline text-primary tracking-tight mb-2">Vanessa Rocha</p>
