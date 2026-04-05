@@ -23,12 +23,12 @@ const cardImages = {
 // Posição do rosto da Vanessa em cada foto (analisado manualmente)
 const cardFocusPoint = {
   'disc': 'center 15%',
-  'roda-da-vida': 'center 10%',
-  'inteligencia-emocional': 'center 25%',
-  'inteligência-emocional': 'center 25%',
+  'roda-da-vida': 'center 0%',
+  'inteligencia-emocional': 'center 10%',
+  'inteligência-emocional': 'center 10%',
   'valores-pessoais': 'center 15%',
-  'metas-smart': 'center 30%',
-  'sabotadores': 'center 20%',
+  'metas-smart': 'center 15%',
+  'sabotadores': 'center 5%',
   'diário': 'center 12%',
   'diario': 'center 12%',
 };
