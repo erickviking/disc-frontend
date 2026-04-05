@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../lib/api.js';
-import { ClipboardList, Eye, Unlock, ChevronDown, ChevronUp, Trash2 } from 'lucide-react';
+import { ClipboardList, Eye, Unlock, FileText, ChevronDown, ChevronUp, Trash2, Loader2 } from 'lucide-react';
 
 const profileNames = { D: 'Executor', I: 'Comunicador', S: 'Planejador', C: 'Analista' };
 const statusLabels = {
@@ -18,6 +18,7 @@ export default function AdminAssessmentsPage() {
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState(null);
   const [releasing, setReleasing] = useState(null);
+  const [generating, setGenerating] = useState(null);
   const [deleting, setDeleting] = useState(null);
   const [adminNotes, setAdminNotes] = useState('');
 
@@ -32,19 +33,26 @@ export default function AdminAssessmentsPage() {
     setReleasing(id);
     try {
       await api.patch('/admin/assessments/' + id + '/release', { adminNotes: adminNotes || undefined });
-      setAdminNotes(''); setExpanded(null); await load();
+      setAdminNotes(''); await load();
     } catch (e) { alert(e.message); }
     finally { setReleasing(null); }
+  };
+
+  const generateReport = async (id) => {
+    setGenerating(id);
+    try {
+      const result = await api.post('/admin/assessments/' + id + '/generate-report', {});
+      alert(result.message || 'Relatorio gerado!');
+      await load();
+    } catch (e) { alert('Erro: ' + e.message); }
+    finally { setGenerating(null); }
   };
 
   const deleteAssessment = async (id) => {
     if (!confirm('Tem certeza que deseja deletar este assessment? Esta acao nao pode ser desfeita.')) return;
     setDeleting(id);
-    try {
-      await api.delete('/admin/assessments/' + id);
-      setExpanded(null);
-      await load();
-    } catch (e) { alert(e.message); }
+    try { await api.delete('/admin/assessments/' + id); setExpanded(null); await load(); }
+    catch (e) { alert(e.message); }
     finally { setDeleting(null); }
   };
 
@@ -60,7 +68,6 @@ export default function AdminAssessmentsPage() {
         <div className="card flex flex-col items-center py-16 text-center">
           <div className="mb-4 rounded-xl bg-gray-100 p-4 text-gray-400"><ClipboardList size={32}/></div>
           <h3 className="font-display text-lg text-gray-500">Nenhum assessment</h3>
-          <p className="mt-2 max-w-xs text-sm text-gray-400">Quando usuarios completarem testes, eles apareceram aqui.</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -69,6 +76,7 @@ export default function AdminAssessmentsPage() {
             const scores = a.scoresRaw?.normalized;
             const isExpanded = expanded === a.id;
             const canRelease = a.status === 'COMPLETED' || a.status === 'REVIEWED';
+            const canGenerateReport = (a.status === 'RELEASED' || a.status === 'COMPLETED' || a.status === 'REVIEWED') && !a.report;
             const hasReport = !!a.report;
 
             return (
@@ -120,22 +128,30 @@ export default function AdminAssessmentsPage() {
                       </div>
                     )}
 
-                    {hasReport && (
-                      <div className="mb-4">
+                    {/* Actions */}
+                    <div className="flex flex-wrap gap-3 mb-4">
+                      {hasReport && (
                         <button onClick={(e) => { e.stopPropagation(); navigate('/report/' + a.id); }} className="btn-primary gap-2">
-                          <Eye size={14}/>Ver Relatorio Completo
+                          <Eye size={14}/>Ver Relatorio
                         </button>
-                      </div>
-                    )}
+                      )}
+
+                      {canGenerateReport && (
+                        <button onClick={(e) => { e.stopPropagation(); generateReport(a.id); }} disabled={generating === a.id} className="btn-primary gap-2">
+                          {generating === a.id ? <Loader2 size={14} className="animate-spin"/> : <FileText size={14}/>}
+                          Gerar Relatorio
+                        </button>
+                      )}
+                    </div>
 
                     {canRelease && (
                       <div className="border-t border-gray-100 pt-4 mb-4">
                         <h4 className="text-sm font-semibold text-gray-700 mb-2">Liberar Assessment</h4>
-                        <textarea className="input-field mb-3" rows={2} placeholder="Nota para a IA (opcional) - ex: foco em lideranca, contexto de transicao de carreira..."
+                        <textarea className="input-field mb-3" rows={2} placeholder="Nota para a IA (opcional) - ex: foco em lideranca..."
                           value={adminNotes} onChange={e => setAdminNotes(e.target.value)}/>
                         <button onClick={() => release(a.id)} disabled={releasing === a.id} className="btn-primary gap-2">
-                          {releasing === a.id ? <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"/> : <Unlock size={14}/>}
-                          Liberar e Gerar Relatorio
+                          {releasing === a.id ? <Loader2 size={14} className="animate-spin"/> : <Unlock size={14}/>}
+                          Liberar
                         </button>
                       </div>
                     )}
@@ -143,12 +159,10 @@ export default function AdminAssessmentsPage() {
                     {a.releasedAt && <p className="text-xs text-green-600 mt-2">Liberado em {fmtDate(a.releasedAt)}</p>}
                     {a.adminNotes && <p className="text-xs text-gray-500 mt-1">Nota: {a.adminNotes}</p>}
 
-                    {/* Delete button */}
                     <div className="border-t border-gray-100 pt-4 mt-4">
-                      <button onClick={(e) => { e.stopPropagation(); deleteAssessment(a.id); }}
-                        disabled={deleting === a.id}
+                      <button onClick={(e) => { e.stopPropagation(); deleteAssessment(a.id); }} disabled={deleting === a.id}
                         className="flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium text-red-600 hover:bg-red-50 transition-colors disabled:opacity-40">
-                        {deleting === a.id ? <div className="h-3 w-3 animate-spin rounded-full border-2 border-red-600 border-t-transparent"/> : <Trash2 size={14}/>}
+                        {deleting === a.id ? <Loader2 size={14} className="animate-spin"/> : <Trash2 size={14}/>}
                         Deletar Assessment
                       </button>
                     </div>
