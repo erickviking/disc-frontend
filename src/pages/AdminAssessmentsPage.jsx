@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../lib/api.js';
-import { ClipboardList, Eye, Unlock, ChevronDown, ChevronUp } from 'lucide-react';
+import { ClipboardList, Eye, Unlock, ChevronDown, ChevronUp, Trash2 } from 'lucide-react';
 
 const profileNames = { D: 'Executor', I: 'Comunicador', S: 'Planejador', C: 'Analista' };
 const statusLabels = {
@@ -18,6 +18,7 @@ export default function AdminAssessmentsPage() {
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState(null);
   const [releasing, setReleasing] = useState(null);
+  const [deleting, setDeleting] = useState(null);
   const [adminNotes, setAdminNotes] = useState('');
 
   const load = async () => {
@@ -34,6 +35,17 @@ export default function AdminAssessmentsPage() {
       setAdminNotes(''); setExpanded(null); await load();
     } catch (e) { alert(e.message); }
     finally { setReleasing(null); }
+  };
+
+  const deleteAssessment = async (id) => {
+    if (!confirm('Tem certeza que deseja deletar este assessment? Esta acao nao pode ser desfeita.')) return;
+    setDeleting(id);
+    try {
+      await api.delete('/admin/assessments/' + id);
+      setExpanded(null);
+      await load();
+    } catch (e) { alert(e.message); }
+    finally { setDeleting(null); }
   };
 
   const fmtDate = (d) => new Date(d).toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit', year:'2-digit', hour:'2-digit', minute:'2-digit' });
@@ -108,7 +120,6 @@ export default function AdminAssessmentsPage() {
                       </div>
                     )}
 
-                    {/* Botão ver relatório para admin */}
                     {hasReport && (
                       <div className="mb-4">
                         <button onClick={(e) => { e.stopPropagation(); navigate('/report/' + a.id); }} className="btn-primary gap-2">
@@ -118,7 +129,7 @@ export default function AdminAssessmentsPage() {
                     )}
 
                     {canRelease && (
-                      <div className="border-t border-gray-100 pt-4">
+                      <div className="border-t border-gray-100 pt-4 mb-4">
                         <h4 className="text-sm font-semibold text-gray-700 mb-2">Liberar Assessment</h4>
                         <textarea className="input-field mb-3" rows={2} placeholder="Nota para a IA (opcional) - ex: foco em lideranca, contexto de transicao de carreira..."
                           value={adminNotes} onChange={e => setAdminNotes(e.target.value)}/>
@@ -131,6 +142,16 @@ export default function AdminAssessmentsPage() {
 
                     {a.releasedAt && <p className="text-xs text-green-600 mt-2">Liberado em {fmtDate(a.releasedAt)}</p>}
                     {a.adminNotes && <p className="text-xs text-gray-500 mt-1">Nota: {a.adminNotes}</p>}
+
+                    {/* Delete button */}
+                    <div className="border-t border-gray-100 pt-4 mt-4">
+                      <button onClick={(e) => { e.stopPropagation(); deleteAssessment(a.id); }}
+                        disabled={deleting === a.id}
+                        className="flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium text-red-600 hover:bg-red-50 transition-colors disabled:opacity-40">
+                        {deleting === a.id ? <div className="h-3 w-3 animate-spin rounded-full border-2 border-red-600 border-t-transparent"/> : <Trash2 size={14}/>}
+                        Deletar Assessment
+                      </button>
+                    </div>
                   </div>
                 )}
               </div>

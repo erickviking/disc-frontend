@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext.jsx';
 import { api } from '../lib/api.js';
-import { ClipboardList, ArrowRight, CheckCircle2, Eye, FileText } from 'lucide-react';
+import { ClipboardList, ArrowRight, CheckCircle2, Eye, FileText, Plus } from 'lucide-react';
 
 const profileNames = { D: 'Executor', I: 'Comunicador', S: 'Planejador', C: 'Analista' };
 
@@ -22,10 +22,12 @@ export default function UserDashboard() {
 
   const greeting = () => { const h = new Date().getHours(); return h<12?'Bom dia':h<18?'Boa tarde':'Boa noite'; };
 
-  const latestCompleted = assessments.find(a => a.status !== 'IN_PROGRESS');
+  const completedTests = assessments.filter(a => a.status !== 'IN_PROGRESS');
+  const latestCompleted = completedTests[0]; // mais recente
   const inProgress = assessments.find(a => a.status === 'IN_PROGRESS');
   const hasTest = !!latestCompleted;
   const hasReport = !!latestCompleted?.report;
+  const canStartNew = !inProgress;
 
   const statusText = {
     COMPLETED: 'Aguardando liberacao do coach',
@@ -44,7 +46,7 @@ export default function UserDashboard() {
             {hasTest ? <CheckCircle2 size={32}/> : <ClipboardList size={32}/>}
           </div>
           <h3 className="font-display text-lg text-gray-900">
-            {hasTest ? 'Teste Concluido' : inProgress ? 'Teste em Andamento' : 'Questionario Comportamental'}
+            {hasTest ? 'Ultimo Teste' : inProgress ? 'Teste em Andamento' : 'Questionario Comportamental'}
           </h3>
           {hasTest ? (
             <>
@@ -63,6 +65,9 @@ export default function UserDashboard() {
                 <p className="mt-2 text-sm text-gray-600">Perfil: <span className="font-semibold">{profileNames[latestCompleted.profilePrimary]} / {profileNames[latestCompleted.profileSecondary]}</span></p>
               )}
               <p className="mt-2 text-xs text-gray-400">{statusText[latestCompleted.status] || latestCompleted.status}</p>
+              {canStartNew && (
+                <button onClick={() => navigate('/quiz')} className="btn-secondary mt-4 gap-2 !text-xs"><Plus size={14}/>Refazer Teste</button>
+              )}
             </>
           ) : (
             <>
@@ -88,7 +93,7 @@ export default function UserDashboard() {
           </h3>
           {hasReport ? (
             <>
-              <p className="mt-2 max-w-xs text-sm text-gray-500">Seu relatorio personalizado esta pronto! Clique abaixo para visualizar sua analise completa.</p>
+              <p className="mt-2 max-w-xs text-sm text-gray-500">Seu relatorio personalizado esta pronto!</p>
               <button onClick={() => navigate('/report/' + latestCompleted.id)} className="btn-primary mt-6 gap-2"><Eye size={16}/>Ver Relatorio</button>
             </>
           ) : (
