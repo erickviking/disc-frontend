@@ -1,4 +1,29 @@
-import { useState, useEffect } from 'react';
+const fs = require('fs');
+const path = require('path');
+
+const dashPath = 'src/pages/UserDashboard.jsx';
+if (!fs.existsSync(dashPath)) {
+  console.log('ERRO: Rode este script em C:\\disc-system\\frontend');
+  process.exit(1);
+}
+
+let dash = fs.readFileSync(dashPath, 'utf8');
+
+// ============================================
+// CHECK: Is this the disc-update version or the old bento version?
+// ============================================
+
+const isNewVersion = dash.includes("/tools/my") || dash.includes("hasAccess");
+const isOldVersion = dash.includes("LockedCardLarge") || dash.includes("LockedCardCompact");
+
+console.log('Versao detectada:', isNewVersion ? 'disc-update (nova)' : isOldVersion ? 'bento (antiga)' : 'desconhecida');
+console.log('Reescrevendo UserDashboard.jsx completo...\n');
+
+// ============================================
+// REWRITE UserDashboard.jsx — versão definitiva
+// ============================================
+
+const newDash = `import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext.jsx';
 import { api } from '../lib/api.js';
@@ -32,7 +57,7 @@ export default function UserDashboard() {
   const [allTools, setAllTools] = useState([]);
   const [assessments, setAssessments] = useState([]);
   const [loading, setLoading] = useState(true);
-  const firstName = (user?.name || 'Usu\u00e1rio').split(' ')[0];
+  const firstName = (user?.name || 'Usu\\u00e1rio').split(' ')[0];
 
   useEffect(() => {
     const load = async () => {
@@ -111,7 +136,7 @@ export default function UserDashboard() {
             {firstName}
           </h1>
           <p className="mt-2 text-sm text-on-surface-variant max-w-md">
-            Explore suas ferramentas de desenvolvimento pessoal e descubra mais sobre voc\u00ea.
+            Explore suas ferramentas de desenvolvimento pessoal e descubra mais sobre voc\\u00ea.
           </p>
         </div>
       </div>
@@ -131,10 +156,10 @@ export default function UserDashboard() {
               <div className="flex justify-between items-start mb-6">
                 <div>
                   <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/15 text-emerald-400 text-xs font-bold uppercase tracking-widest">
-                    <span className="w-2 h-2 rounded-full bg-emerald-400" /> Conclu\u00eddo
+                    <span className="w-2 h-2 rounded-full bg-emerald-400" /> Conclu\\u00eddo
                   </span>
                   <h3 className="mt-3 text-2xl lg:text-3xl font-headline font-bold text-on-surface tracking-tight">
-                    An\u00e1lise Comportamental DISC
+                    An\\u00e1lise Comportamental DISC
                   </h3>
                 </div>
                 <CheckCircle2 size={32} className="text-primary" />
@@ -171,7 +196,7 @@ export default function UserDashboard() {
                     : ''}
                 </span>
                 <button className="flex items-center gap-2 text-xs font-bold text-primary uppercase tracking-widest hover:text-gold-200 transition-colors">
-                  Ver relat\u00f3rio completo <ArrowRight size={14} />
+                  Ver relat\\u00f3rio completo <ArrowRight size={14} />
                 </button>
               </div>
             </div>
@@ -190,9 +215,9 @@ export default function UserDashboard() {
             <div className="absolute inset-0 bg-gradient-to-t from-surface via-surface/70 to-transparent" />
             <div className="absolute bottom-4 left-6 right-6 z-10">
               <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/20 backdrop-blur-sm text-primary text-xs font-bold uppercase tracking-widest mb-2">
-                {discStatus === 'in_progress' ? 'Em andamento' : 'Dispon\u00edvel'}
+                {discStatus === 'in_progress' ? 'Em andamento' : 'Dispon\\u00edvel'}
               </span>
-              <h3 className="text-2xl font-headline font-bold text-on-surface">An\u00e1lise DISC</h3>
+              <h3 className="text-2xl font-headline font-bold text-on-surface">An\\u00e1lise DISC</h3>
             </div>
           </div>
           <div className="p-6">
@@ -220,11 +245,11 @@ export default function UserDashboard() {
             return (
               <div
                 key={tool.id}
-                className={`group relative flex flex-col rounded-2xl overflow-hidden transition-all duration-300 border ${
+                className={\`group relative flex flex-col rounded-2xl overflow-hidden transition-all duration-300 border \${
                   isLocked
                     ? 'border-outline-variant/10 cursor-default'
                     : 'border-outline-variant/20 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 cursor-pointer'
-                }`}
+                }\`}
                 onClick={() => !isLocked && handleAction(tool)}
               >
                 {/* Image */}
@@ -233,18 +258,18 @@ export default function UserDashboard() {
                     <img
                       src={bgImage}
                       alt=""
-                      className={`absolute inset-0 w-full h-full object-cover object-top transition-transform duration-500 ${
+                      className={\`absolute inset-0 w-full h-full object-cover object-top transition-transform duration-500 \${
                         isLocked ? 'grayscale brightness-50 blur-[1px]' : 'group-hover:scale-105'
-                      }`}
+                      }\`}
                     />
                   )}
 
                   {/* Overlay */}
-                  <div className={`absolute inset-0 ${
+                  <div className={\`absolute inset-0 \${
                     isLocked
                       ? 'bg-surface/70'
                       : 'bg-gradient-to-t from-surface-container via-surface-container/40 to-transparent'
-                  }`} />
+                  }\`} />
 
                   {/* Lock */}
                   {isLocked && (
@@ -265,11 +290,11 @@ export default function UserDashboard() {
                     <div className="absolute top-3 right-3 z-10">
                       {status === 'completed' ? (
                         <span className="flex items-center gap-1 rounded-full bg-emerald-500/20 backdrop-blur-sm px-2.5 py-1 text-xs font-medium text-emerald-400 border border-emerald-500/20">
-                          <CheckCircle2 size={10} /> Conclu\u00eddo
+                          <CheckCircle2 size={10} /> Conclu\\u00eddo
                         </span>
                       ) : status === 'awaiting_report' ? (
                         <span className="flex items-center gap-1 rounded-full bg-amber-500/20 backdrop-blur-sm px-2.5 py-1 text-xs font-medium text-amber-400 border border-amber-500/20">
-                          <Clock size={10} /> Aguardando relat\u00f3rio
+                          <Clock size={10} /> Aguardando relat\\u00f3rio
                         </span>
                       ) : status === 'in_progress' ? (
                         <span className="flex items-center gap-1 rounded-full bg-blue-500/20 backdrop-blur-sm px-2.5 py-1 text-xs font-medium text-blue-400 border border-blue-500/20">
@@ -277,7 +302,7 @@ export default function UserDashboard() {
                         </span>
                       ) : (
                         <span className="flex items-center gap-1 rounded-full bg-primary/20 backdrop-blur-sm px-2.5 py-1 text-xs font-medium text-primary border border-primary/20">
-                          Dispon\u00edvel
+                          Dispon\\u00edvel
                         </span>
                       )}
                     </div>
@@ -299,7 +324,7 @@ export default function UserDashboard() {
                 {/* Body */}
                 <div className="flex-1 p-5 pt-3 bg-surface-container space-y-3">
                   <div>
-                    <h3 className={`font-headline text-base font-bold ${isLocked ? 'text-on-surface-variant/70' : 'text-on-surface'}`}>
+                    <h3 className={\`font-headline text-base font-bold \${isLocked ? 'text-on-surface-variant/70' : 'text-on-surface'}\`}>
                       {tool.name}
                     </h3>
                     <p className="mt-1 text-xs text-on-surface-variant leading-relaxed line-clamp-2">
@@ -322,12 +347,12 @@ export default function UserDashboard() {
                       )}
                       {status === 'completed' && (
                         <button className="flex items-center gap-2 rounded-xl bg-emerald-500/10 px-4 py-2 text-xs font-semibold text-emerald-400 hover:bg-emerald-500/20 transition-colors w-full justify-center">
-                          Ver relat\u00f3rio <ArrowRight size={14} />
+                          Ver relat\\u00f3rio <ArrowRight size={14} />
                         </button>
                       )}
                       {status === 'awaiting_report' && (
                         <div className="flex items-center gap-2 rounded-xl bg-amber-500/5 px-4 py-2 text-xs text-amber-400/70 w-full justify-center">
-                          <Clock size={12} /> Relat\u00f3rio sendo preparado
+                          <Clock size={12} /> Relat\\u00f3rio sendo preparado
                         </div>
                       )}
                     </div>
@@ -350,10 +375,10 @@ export default function UserDashboard() {
             Quer ir mais fundo?
           </h3>
           <p className="mt-2 text-sm text-on-surface-variant leading-relaxed">
-            Que tal agendar uma sess\u00e3o de devolutiva para explorar seus resultados?
+            Que tal agendar uma sess\\u00e3o de devolutiva para explorar seus resultados?
           </p>
           <button className="mt-4 flex items-center gap-2 rounded-xl bg-primary px-6 py-2.5 text-xs font-bold text-on-primary uppercase tracking-widest hover:bg-primary/90 transition-colors shadow-lg">
-            Solicitar sess\u00e3o <ArrowRight size={14} />
+            Solicitar sess\\u00e3o <ArrowRight size={14} />
           </button>
         </div>
         <div className="absolute right-8 bottom-0 hidden lg:block">
@@ -363,3 +388,20 @@ export default function UserDashboard() {
     </div>
   );
 }
+`;
+
+fs.writeFileSync(dashPath, newDash, 'utf8');
+console.log('OK: UserDashboard.jsx reescrito');
+
+console.log('\\n============================================');
+console.log('  Dashboard corrigido!');
+console.log('============================================');
+console.log('\\nMudancas:');
+console.log('  - Chama /tools (nao /tools/my) para ferramentas com acesso');
+console.log('  - DISC hero card com scores quando concluido');
+console.log('  - Todas as ferramentas bloqueadas com card grande + imagem');
+console.log('  - Imagens com object-top (nao corta cabeca)');
+console.log('  - Acentuacao corrigida em todos os textos');
+console.log('\\nDeploy:');
+console.log('  Remove-Item *.cjs');
+console.log('  git add . && git commit -m "fix: dashboard definitivo" && git push');
