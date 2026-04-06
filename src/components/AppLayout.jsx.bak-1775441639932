@@ -8,6 +8,7 @@ const adminNav = [
   { to: '/admin/users', icon: Users, label: 'Usuários' },
   { to: '/admin/tools', icon: Wrench, label: 'Ferramentas' },
   { to: '/admin/invites', icon: Link2, label: 'Convites' },
+  { to: '/admin/assessments', icon: ClipboardList, label: 'Assessments' },
 ];
 const userNav = [
   { to: '/dashboard', icon: LayoutDashboard, label: 'Inicio', end: true },
