@@ -131,7 +131,7 @@ function RodaChart({ scores }) {
       })}
     </svg>
   );
-}}
+}
 
 function Section({ icon: Icon, title, children, color = 'text-primary bg-primary/15' }) {
   return (
