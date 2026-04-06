@@ -128,8 +128,7 @@ export default function RodaDaVidaReportPage() {
   if (loading) return <div className="flex h-screen items-center justify-center bg-surface"><div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" /></div>;
   if (error) return <div className="p-8"><div className="card text-center py-12"><p className="text-red-400">{error}</p><button onClick={() => navigate(-1)} className="btn-secondary mt-4 gap-2"><ArrowLeft size={16} />Voltar</button></div></div>;
 
-  const { report, scores: rawScores, scoresRaw, userName } = data;
-  const scores = rawScores || scoresRaw?.scores || {};
+  const { report, scores, userName } = data;
   const n = report.narrative;
 
   return (
