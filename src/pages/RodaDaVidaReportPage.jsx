@@ -1,0 +1,274 @@
+import { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext.jsx';
+import { api } from '../lib/api.js';
+import { ArrowLeft, Download, TrendingUp, AlertTriangle, Lightbulb, Link2, Target, Loader2 } from 'lucide-react';
+
+const areaLabels = {
+  saude: 'Saúde e Disposição',
+  intelectual: 'Desenvolvimento Intelectual',
+  emocional: 'Equilíbrio Emocional',
+  proposito: 'Realização e Propósito',
+  financas: 'Recursos Financeiros',
+  contribuicao: 'Contribuição Social',
+  familia: 'Família',
+  relacionamento: 'Relacionamento Amoroso',
+  social: 'Vida Social',
+  diversao: 'Criatividade e Diversão',
+  plenitude: 'Plenitude e Felicidade',
+  espiritualidade: 'Espiritualidade',
+};
+
+const areaColors = {
+  saude: '#E63946', intelectual: '#4c6ef5', emocional: '#7c3aed', proposito: '#F4A261',
+  financas: '#059669', contribuicao: '#2A9D8F', familia: '#E63946', relacionamento: '#ec4899',
+  social: '#f59e0b', diversao: '#8b5cf6', plenitude: '#d4a853', espiritualidade: '#6366f1',
+};
+
+function RodaChart({ scores }) {
+  const size = 360;
+  const center = size / 2;
+  const radius = 140;
+  const areas = Object.keys(scores);
+  const count = areas.length;
+
+  const getPoint = (index, value) => {
+    const angle = (Math.PI * 2 * index) / count - Math.PI / 2;
+    const r = radius * (value / 10);
+    return { x: center + Math.cos(angle) * r, y: center + Math.sin(angle) * r };
+  };
+
+  const dataPoints = areas.map((a, i) => getPoint(i, scores[a]));
+  const polygon = dataPoints.map(p => p.x + ',' + p.y).join(' ');
+
+  return (
+    <svg viewBox={"0 0 " + size + " " + size} className="w-full max-w-[360px] mx-auto">
+      {/* Grid circles */}
+      {[2, 4, 6, 8, 10].map(v => (
+        <polygon
+          key={v}
+          points={areas.map((_, i) => { const p = getPoint(i, v); return p.x + ',' + p.y; }).join(' ')}
+          fill="none"
+          stroke="rgba(61,56,48,0.3)"
+          strokeWidth={v === 10 ? 1.5 : 0.5}
+        />
+      ))}
+
+      {/* Axis lines */}
+      {areas.map((_, i) => {
+        const p = getPoint(i, 10);
+        return <line key={i} x1={center} y1={center} x2={p.x} y2={p.y} stroke="rgba(61,56,48,0.2)" strokeWidth="0.5" />;
+      })}
+
+      {/* Data polygon */}
+      <polygon points={polygon} fill="rgba(42,157,143,0.15)" stroke="#2A9D8F" strokeWidth="2.5" strokeLinejoin="round" />
+
+      {/* Data points + labels */}
+      {areas.map((a, i) => {
+        const p = dataPoints[i];
+        const lp = getPoint(i, 12.5);
+        const color = areaColors[a] || '#d4a853';
+        const label = (areaLabels[a] || a).split(' ').slice(0, 2).join(' ');
+        return (
+          <g key={a}>
+            <circle cx={p.x} cy={p.y} r="5" fill={color} />
+            <text x={lp.x} y={lp.y - 6} textAnchor="middle" dominantBaseline="middle" fontSize="9" fontWeight="700" fill={color}>
+              {label}
+            </text>
+            <text x={lp.x} y={lp.y + 6} textAnchor="middle" fontSize="10" fontWeight="600" fill="#bfb5a8">
+              {scores[a]}
+            </text>
+          </g>
+        );
+      })}
+
+      {/* Center average */}
+      {(() => {
+        const avg = Math.round((Object.values(scores).reduce((a, b) => a + b, 0) / count) * 10) / 10;
+        return (
+          <text x={center} y={center + 4} textAnchor="middle" fontSize="18" fontWeight="800" fill="#d4a853">
+            {avg}
+          </text>
+        );
+      })()}
+    </svg>
+  );
+}
+
+function Section({ icon: Icon, title, children, color = 'text-primary bg-primary/15' }) {
+  return (
+    <div className="mb-6">
+      <div className="flex items-center gap-2 mb-3">
+        <div className={"rounded-lg p-1.5 " + color}><Icon size={16} /></div>
+        <h3 className="font-headline text-lg font-semibold text-on-surface">{title}</h3>
+      </div>
+      {children}
+    </div>
+  );
+}
+
+export default function RodaDaVidaReportPage() {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const { isAdmin } = useAuth();
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const endpoint = isAdmin ? '/admin/assessments/' + id + '/report' : '/assessments/' + id + '/report';
+        setData(await api.get(endpoint));
+      } catch (e) { setError(e.message); }
+      finally { setLoading(false); }
+    })();
+  }, [id, isAdmin]);
+
+  if (loading) return <div className="flex h-screen items-center justify-center bg-surface"><div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" /></div>;
+  if (error) return <div className="p-8"><div className="card text-center py-12"><p className="text-red-400">{error}</p><button onClick={() => navigate(-1)} className="btn-secondary mt-4 gap-2"><ArrowLeft size={16} />Voltar</button></div></div>;
+
+  const { report, scores, userName } = data;
+  const n = report.narrative;
+
+  return (
+    <div className="min-h-screen bg-surface">
+      <div className="mx-auto max-w-3xl px-4 py-8">
+        <div className="flex items-center justify-between mb-6">
+          <button onClick={() => navigate(-1)} className="btn-secondary gap-1"><ArrowLeft size={16} />Voltar</button>
+        </div>
+
+        {/* Header + Roda */}
+        <div className="card mb-6 text-center">
+          <p className="text-xs font-medium uppercase tracking-widest text-on-surface-variant/50 mb-2">Roda da Vida</p>
+          <h1 className="font-headline text-2xl font-bold text-on-surface mb-1">{userName}</h1>
+          <p className="text-sm text-on-surface-variant mb-6">
+            Avaliação de {Object.keys(scores).length} áreas da vida
+          </p>
+          <RodaChart scores={scores} />
+        </div>
+
+        {/* Resumo Geral */}
+        {n.resumoGeral && (
+          <div className="card mb-6">
+            <h2 className="font-headline text-xl font-semibold text-on-surface mb-3">Visão Geral</h2>
+            <p className="text-sm leading-relaxed text-on-surface-variant">{n.resumoGeral}</p>
+          </div>
+        )}
+
+        {/* Análise de Equilíbrio */}
+        {n.analiseEquilibrio && (
+          <div className="card mb-6">
+            <h2 className="font-headline text-xl font-semibold text-on-surface mb-1">Análise de Equilíbrio</h2>
+            <span className={"inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider mb-3 " + (
+              n.analiseEquilibrio.nivel === 'equilibrado' ? 'bg-emerald-500/15 text-emerald-400' :
+              n.analiseEquilibrio.nivel === 'moderado' ? 'bg-amber-500/15 text-amber-400' :
+              'bg-red-500/15 text-red-400'
+            )}>
+              {n.analiseEquilibrio.nivel}
+            </span>
+            <p className="text-sm leading-relaxed text-on-surface-variant whitespace-pre-line">{n.analiseEquilibrio.descricao}</p>
+          </div>
+        )}
+
+        {/* Áreas Destaque */}
+        {n.areasDestaquePositivo && (
+          <div className="card mb-6">
+            <Section icon={TrendingUp} title="Áreas em Destaque" color="text-emerald-400 bg-emerald-500/15">
+              <div className="space-y-3">
+                {n.areasDestaquePositivo.map((a, i) => (
+                  <div key={i} className="rounded-xl bg-emerald-500/5 border border-emerald-500/15 px-4 py-3">
+                    <div className="flex items-center justify-between mb-1">
+                      <p className="text-sm font-semibold text-on-surface">{a.area}</p>
+                      <span className="text-xs font-bold text-emerald-400">{a.score}/10</span>
+                    </div>
+                    <p className="text-xs text-on-surface-variant">{a.analise}</p>
+                  </div>
+                ))}
+              </div>
+            </Section>
+          </div>
+        )}
+
+        {/* Áreas de Atenção */}
+        {n.areasAtencao && (
+          <div className="card mb-6">
+            <Section icon={AlertTriangle} title="Áreas de Atenção" color="text-amber-400 bg-amber-500/15">
+              <div className="space-y-3">
+                {n.areasAtencao.map((a, i) => (
+                  <div key={i} className="rounded-xl bg-amber-500/5 border border-amber-500/15 px-4 py-3">
+                    <div className="flex items-center justify-between mb-1">
+                      <p className="text-sm font-semibold text-on-surface">{a.area}</p>
+                      <span className="text-xs font-bold text-amber-400">{a.score}/10</span>
+                    </div>
+                    <p className="text-xs text-on-surface-variant mb-2">{a.analise}</p>
+                    {a.microAcao && (
+                      <div className="flex items-start gap-2 rounded-lg bg-primary/5 px-3 py-2">
+                        <Lightbulb size={12} className="text-primary mt-0.5 shrink-0" />
+                        <p className="text-xs text-primary">{a.microAcao}</p>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </Section>
+          </div>
+        )}
+
+        {/* Conexões entre áreas */}
+        {n.conexoesEntreAreas && (
+          <div className="card mb-6">
+            <Section icon={Link2} title="Conexões entre Áreas" color="text-[#2A9D8F] bg-[#2A9D8F]/15">
+              <p className="text-sm leading-relaxed text-on-surface-variant whitespace-pre-line">{n.conexoesEntreAreas}</p>
+            </Section>
+          </div>
+        )}
+
+        {/* Plano de Ação */}
+        {n.planoDeAcao && (
+          <div className="card mb-6">
+            <Section icon={Target} title="Plano de Ação — 30 Dias" color="text-primary bg-primary/15">
+              <div className="space-y-4">
+                {['prioridade1', 'prioridade2', 'prioridade3'].map((pk, pi) => {
+                  const p = n.planoDeAcao[pk];
+                  if (!p) return null;
+                  return (
+                    <div key={pk} className="rounded-xl bg-surface-container-low border border-outline-variant/15 p-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/15 text-xs font-bold text-primary">{pi + 1}</span>
+                        <h4 className="text-sm font-semibold text-on-surface">{p.area}</h4>
+                      </div>
+                      <p className="text-xs text-on-surface-variant mb-3">{p.meta}</p>
+                      <ul className="space-y-1.5">
+                        {(p.acoes || []).map((acao, ai) => (
+                          <li key={ai} className="flex gap-2 text-xs text-on-surface-variant">
+                            <span className="text-primary font-bold mt-0.5">•</span>
+                            <span>{acao}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  );
+                })}
+              </div>
+            </Section>
+          </div>
+        )}
+
+        {/* Reflexão Final */}
+        {n.reflexaoFinal && (
+          <div className="card mb-6">
+            <div className="rounded-xl bg-primary/5 border border-primary/15 p-5">
+              <p className="text-sm leading-relaxed text-on-surface-variant italic">{n.reflexaoFinal}</p>
+            </div>
+          </div>
+        )}
+
+        <div className="text-center text-xs text-on-surface-variant/40 py-4">
+          <p>Vanessa Rocha — Roda da Vida</p>
+          <p className="mt-1">Gerado em {new Date(report.generatedAt).toLocaleDateString('pt-BR')}</p>
+        </div>
+      </div>
+    </div>
+  );
+}

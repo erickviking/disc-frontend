@@ -13,6 +13,8 @@ import UserDashboard from './pages/UserDashboard.jsx';
 import UserAssessmentsPage from './pages/UserAssessmentsPage.jsx';
 import QuizPage from './pages/QuizPage.jsx';
 import ReportPage from './pages/ReportPage.jsx';
+import RodaDaVidaQuizPage from './pages/RodaDaVidaQuizPage.jsx';
+import RodaDaVidaReportPage from './pages/RodaDaVidaReportPage.jsx';
 
 function RootRedirect() {
   const { isAuthenticated, isAdmin, loading } = useAuth();
@@ -30,6 +32,8 @@ export default function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/quiz" element={<ProtectedRoute><QuizPage /></ProtectedRoute>} />
+          <Route path="/roda-da-vida/quiz" element={<ProtectedRoute><RodaDaVidaQuizPage /></ProtectedRoute>} />
+          <Route path="/roda-da-vida/report/:id" element={<ProtectedRoute><RodaDaVidaReportPage /></ProtectedRoute>} />
           <Route path="/report/:id" element={<ProtectedRoute><ReportPage /></ProtectedRoute>} />
           <Route path="/admin" element={<ProtectedRoute requireAdmin><AppLayout /></ProtectedRoute>}>
             <Route index element={<AdminDashboard />} />

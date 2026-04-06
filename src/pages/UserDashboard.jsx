@@ -21,12 +21,12 @@ const cardImages = {
 // Posição do rosto da Vanessa em cada foto
 const cardFocusPoint = {
   'disc': 'center 15%',
-  'roda-da-vida': 'center 0%',
-  'inteligencia-emocional': 'center 40%',
-  'valores-pessoais': 'center 45%',
-  'metas-smart': 'center 15%',
+  'roda-da-vida': 'center 10%',
+  'inteligencia-emocional': 'center 25%',
+  'valores-pessoais': 'center 15%',
+  'metas-smart': 'center 30%',
   'sabotadores': 'center 20%',
-  'diario': 'center 42%',
+  'diario': 'center 12%',
 };
 
 function getGreeting() {
@@ -235,7 +235,7 @@ export default function UserDashboard() {
             const status = getStatus(tool);
             const isLocked = status === 'locked';
             const bgImage = cardImages[tool.slug];
-            const focusPoint = tool.config?.imagePosition || cardFocusPoint[tool.slug] || 'center 20%';
+            const focusPoint = cardFocusPoint[tool.slug] || 'center 20%';
             const Icon = iconMap[tool.icon] || Target;
 
             return (
