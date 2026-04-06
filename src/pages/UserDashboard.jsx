@@ -78,7 +78,7 @@ export default function UserDashboard() {
     const a = getAssessment(tool.slug);
     if (!a) {
       // Fallback: check if any assessment exists (older data without tool relation)
-      const anyCompleted = assessments.find(ass => ass.scoresRaw && ass.status !== 'IN_PROGRESS');
+      const anyCompleted = assessments.find(ass => ass.scoresRaw?.normalized?.D !== undefined && ass.status !== 'IN_PROGRESS');
       if (tool.slug === 'disc' && anyCompleted) return 'completed';
       return 'available';
     }
