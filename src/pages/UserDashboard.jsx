@@ -92,8 +92,8 @@ export default function UserDashboard() {
     // Try to find assessment linked to disc tool
     const linked = assessments.find(a => a.tool?.slug === 'disc');
     if (linked) return linked;
-    // Fallback: any completed assessment with scores (legacy data)
-    return assessments.find(a => a.scoresRaw && a.status !== 'IN_PROGRESS');
+    // Fallback: any completed DISC assessment with scores (legacy data without tool relation)
+    return assessments.find(a => a.scoresRaw?.normalized?.D !== undefined && a.status !== 'IN_PROGRESS');
   };
 
   const handleAction = (tool) => {
