@@ -28,7 +28,7 @@ const cardFocusPoint = {
   'inteligência-emocional': 'center 40%',
   'valores-pessoais': 'center 45%',
   'metas-smart': 'center 15%',
-  'sabotadores': 'center 35%',
+  'sabotadores': 'center 20%',
   'diário': 'center 42%',
   'diario': 'center 42%',
 };
