@@ -235,7 +235,7 @@ export default function UserDashboard() {
             const status = getStatus(tool);
             const isLocked = status === 'locked';
             const bgImage = cardImages[tool.slug];
-            const focusPoint = tool.config?.imagePosition || cardFocusPoint[tool.slug] || 'center 20%';
+            const focusPoint = cardFocusPoint[tool.slug] || 'center 20%';
             const Icon = iconMap[tool.icon] || Target;
 
             return (
