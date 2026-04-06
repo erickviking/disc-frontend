@@ -15,6 +15,7 @@ import QuizPage from './pages/QuizPage.jsx';
 import ReportPage from './pages/ReportPage.jsx';
 import RodaDaVidaQuizPage from './pages/RodaDaVidaQuizPage.jsx';
 import RodaDaVidaReportPage from './pages/RodaDaVidaReportPage.jsx';
+import ToolHomePage from './pages/ToolHomePage.jsx';
 
 function RootRedirect() {
   const { isAuthenticated, isAdmin, loading } = useAuth();
@@ -45,6 +46,7 @@ export default function App() {
           <Route path="/dashboard" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
             <Route index element={<UserDashboard />} />
             <Route path="assessments" element={<UserAssessmentsPage />} />
+            <Route path="ferramenta/:slug" element={<ToolHomePage />} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
