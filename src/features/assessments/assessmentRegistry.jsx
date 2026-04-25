@@ -2,6 +2,8 @@ import QuizPage from '../../pages/QuizPage.jsx';
 import ReportPage from '../../pages/ReportPage.jsx';
 import RodaDaVidaQuizPage from '../../pages/RodaDaVidaQuizPage.jsx';
 import RodaDaVidaReportPage from '../../pages/RodaDaVidaReportPage.jsx';
+import InteligenciaEmocionalQuizPage from '../../pages/InteligenciaEmocionalQuizPage.jsx';
+import InteligenciaEmocionalReportPage from '../../pages/InteligenciaEmocionalReportPage.jsx';
 
 const assessmentComponents = {
   disc: {
@@ -11,6 +13,10 @@ const assessmentComponents = {
   'roda-da-vida': {
     Quiz: RodaDaVidaQuizPage,
     Report: RodaDaVidaReportPage,
+  },
+  'inteligencia-emocional': {
+    Quiz: InteligenciaEmocionalQuizPage,
+    Report: InteligenciaEmocionalReportPage,
   },
 };
 
