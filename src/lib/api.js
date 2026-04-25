@@ -1,4 +1,4 @@
-const API_BASE = '/api';
+const API_BASE = import.meta.env.VITE_API_BASE_URL || '/api';
 
 class ApiClient {
   constructor() {
@@ -17,10 +17,23 @@ class ApiClient {
     const headers = { 'Content-Type': 'application/json' };
     if (this.token) headers['Authorization'] = 'Bearer ' + this.token;
     if (options.headers) Object.assign(headers, options.headers);
+
     const res = await fetch(API_BASE + path, { ...options, headers });
-    if (res.status === 401) { this.setToken(null); window.location.href = '/login'; throw new Error('Sessao expirada'); }
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Erro inesperado');
+
+    if (res.status === 401) {
+      this.setToken(null);
+      window.location.href = '/login';
+      throw new Error('Sessao expirada');
+    }
+
+    const contentType = res.headers.get('content-type') || '';
+    const hasJson = contentType.includes('application/json');
+    const data = hasJson ? await res.json() : null;
+
+    if (!res.ok) {
+      throw new Error(data?.error || 'Erro inesperado');
+    }
+
     return data;
   }
   get(path) { return this.request(path); }
