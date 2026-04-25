@@ -2,37 +2,11 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../lib/api.js';
 import {
-  Users, Target, Heart, Compass, Rocket, Shield, BookOpen,
+  Users, Target,
   ToggleLeft, ToggleRight, UserPlus, UserMinus, ChevronDown, ChevronUp,
   Lock, Unlock, Star, BarChart3, ImageIcon, Save
 } from 'lucide-react';
-
-const iconMap = { Users, Target, Heart, Compass, Rocket, Shield, BookOpen };
-
-const cardImages = {
-  'disc': '/card-disc.jpg',
-  'roda-da-vida': '/card-roda.jpg',
-  'inteligência-emocional': '/card-ie.jpg',
-  'inteligencia-emocional': '/card-ie.jpg',
-  'valores-pessoais': '/card-valores.jpg',
-  'metas-smart': '/card-metas.jpg',
-  'sabotadores': '/card-sabotadores.jpg',
-  'diário': '/card-diario.jpg',
-  'diario': '/card-diario.jpg',
-};
-
-// Posição do rosto da Vanessa em cada foto (analisado manualmente)
-const cardFocusPoint = {
-  'disc': 'center 15%',
-  'roda-da-vida': 'center 0%',
-  'inteligencia-emocional': 'center 40%',
-  'inteligência-emocional': 'center 40%',
-  'valores-pessoais': 'center 45%',
-  'metas-smart': 'center 15%',
-  'sabotadores': 'center 20%',
-  'diário': 'center 42%',
-  'diario': 'center 42%',
-};
+import { getToolFocusPoint, getToolIcon, getToolImage, getToolUiConfig } from '../features/tools/toolRegistry.js';
 
 export default function AdminToolsPage() {
   const navigate = useNavigate();
@@ -53,7 +27,6 @@ export default function AdminToolsPage() {
       ]);
       const loadedTools = toolsData.tools || [];
       setTools(loadedTools);
-      // Inicializar posições de imagem do config
       const positions = {};
       loadedTools.forEach(t => {
         if (t.config?.imagePosition) positions[t.id] = t.config.imagePosition;
@@ -136,7 +109,6 @@ export default function AdminToolsPage() {
 
   return (
     <div className="space-y-8">
-      {/* Header */}
       <div>
         <h1 className="font-headline text-2xl font-bold text-on-surface">Ferramentas</h1>
         <p className="mt-1 text-sm text-on-surface-variant">
@@ -144,7 +116,6 @@ export default function AdminToolsPage() {
         </p>
       </div>
 
-      {/* Resumo */}
       <div className="flex gap-4 flex-wrap">
         <div className="flex items-center gap-2 rounded-xl bg-surface-container-high px-4 py-2">
           <BarChart3 size={16} className="text-primary" />
@@ -160,23 +131,21 @@ export default function AdminToolsPage() {
         </div>
       </div>
 
-      {/* Cards Grid — Netflix style */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
         {tools.sort((a, b) => a.sortOrder - b.sortOrder).map(tool => {
-          const Icon = iconMap[tool.icon] || Target;
-          const bgImage = cardImages[tool.slug];
-          const focusPoint = imagePositions[tool.id] || cardFocusPoint[tool.slug] || 'center 20%';
+          const Icon = getToolIcon(tool.icon, Target);
+          const bgImage = getToolImage(tool);
+          const focusPoint = imagePositions[tool.id] || getToolFocusPoint(tool);
+          const defaultFocusPoint = getToolUiConfig(tool.slug).focusPoint || 'center 20%';
           const users = toolUsers[tool.id] || [];
           const usersWithout = allUsers.filter(u => !u.isAdmin && !users.find(tu => tu.id === u.id));
           const isExpanded = expanded === tool.id;
-          const userCount = tool._count?.userAccess || 0;
-          const assessmentCount = tool._count?.assessments || 0;
+          const userCount = tool._count?.userAccess || tool.userCount || 0;
+          const assessmentCount = tool._count?.assessments || tool.assessmentCount || 0;
 
           return (
             <div key={tool.id} onClick={() => navigate('/admin/tools/' + tool.slug)}
               className="group flex flex-col rounded-2xl overflow-hidden bg-surface-container border border-outline-variant/30 cursor-pointer transition-all duration-300 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5">
-              
-              {/* Card Image Header */}
               <div className="relative h-48 overflow-hidden">
                 {bgImage ? (
                   <img
@@ -188,12 +157,8 @@ export default function AdminToolsPage() {
                 ) : (
                   <div className="absolute inset-0" style={{ background: `linear-gradient(135deg, ${tool.color}33, ${tool.color}11)` }} />
                 )}
-                
-                {/* Overlay gradiente */}
                 <div className="absolute inset-0 bg-gradient-to-t from-surface-container from-5% via-surface-container/70 via-40% to-surface-container/20 to-100%" />
                 <div className="absolute inset-0 bg-gradient-to-r from-surface-container/30 via-transparent to-surface-container/30" />
-                
-                {/* Status badge */}
                 <div className="absolute top-3 right-3 flex items-center gap-1.5">
                   {tool.isActive ? (
                     <span className="flex items-center gap-1 rounded-full bg-green-500/20 backdrop-blur-sm px-2.5 py-1 text-xs font-medium text-green-400 border border-green-500/20">
@@ -206,7 +171,6 @@ export default function AdminToolsPage() {
                   )}
                 </div>
 
-                {/* Default badge */}
                 {tool.isDefault && (
                   <div className="absolute top-3 left-3">
                     <span className="flex items-center gap-1 rounded-full bg-primary/20 backdrop-blur-sm px-2.5 py-1 text-xs font-medium text-primary border border-primary/20">
@@ -215,7 +179,6 @@ export default function AdminToolsPage() {
                   </div>
                 )}
 
-                {/* Icon floating */}
                 <div className="absolute bottom-3 left-4">
                   <div
                     className="flex h-10 w-10 items-center justify-center rounded-xl shadow-lg"
@@ -226,7 +189,6 @@ export default function AdminToolsPage() {
                 </div>
               </div>
 
-              {/* Card Body */}
               <div className="flex-1 p-4 pt-2 space-y-3">
                 <div>
                   <h3 className="font-headline text-lg font-bold text-on-surface">{tool.name}</h3>
@@ -235,7 +197,6 @@ export default function AdminToolsPage() {
                   </p>
                 </div>
 
-                {/* Métricas */}
                 <div className="flex gap-4">
                   <div className="flex items-center gap-1.5">
                     <Users size={12} className="text-on-surface-variant" />
@@ -251,7 +212,6 @@ export default function AdminToolsPage() {
                   </div>
                 </div>
 
-                {/* Ações */}
                 <div className="flex items-center gap-2 pt-1">
                   <button
                     onClick={(e) => { e.stopPropagation(); toggleTool(tool); }}
@@ -285,7 +245,7 @@ export default function AdminToolsPage() {
                   </button>
 
                   <button
-                    onClick={() => handleExpand(tool.id)}
+                    onClick={(e) => { e.stopPropagation(); handleExpand(tool.id); }}
                     className="ml-auto flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-medium bg-surface-container-high text-on-surface-variant hover:bg-surface-container-highest transition-colors"
                   >
                     <Users size={12} />
@@ -295,17 +255,15 @@ export default function AdminToolsPage() {
                 </div>
               </div>
 
-              {/* Expandido: controle de acesso por usuário */}
               {isExpanded && (
                 <div className="border-t border-outline-variant/20 bg-surface-container-low p-4 space-y-4" onClick={(e) => e.stopPropagation()}>
-                  {/* Posição da imagem */}
                   <div className="mb-4 pb-4 border-b border-outline-variant/20">
                     <div className="flex items-center justify-between mb-3">
                       <p className="text-xs font-semibold text-on-surface uppercase tracking-wider flex items-center gap-1.5">
                         <ImageIcon size={12} /> Posição da imagem
                       </p>
                       <span className="text-[10px] text-on-surface-variant font-mono">
-                        {imagePositions[tool.id] || cardFocusPoint[tool.slug] || 'center 20%'}
+                        {imagePositions[tool.id] || defaultFocusPoint}
                       </span>
                     </div>
                     <div className="flex items-center gap-3">
@@ -314,7 +272,7 @@ export default function AdminToolsPage() {
                         type="range"
                         min="0"
                         max="100"
-                        value={parseInt((imagePositions[tool.id] || cardFocusPoint[tool.slug] || 'center 20%').match(/\d+/)?.[0] || '20')}
+                        value={parseInt((imagePositions[tool.id] || defaultFocusPoint).match(/\d+/)?.[0] || '20')}
                         onChange={(e) => {
                           const pos = 'center ' + e.target.value + '%';
                           setImagePositions(prev => ({ ...prev, [tool.id]: pos }));
@@ -323,7 +281,7 @@ export default function AdminToolsPage() {
                       />
                       <span className="text-[10px] text-on-surface-variant">Base</span>
                       <button
-                        onClick={() => saveImagePosition(tool.id, imagePositions[tool.id] || cardFocusPoint[tool.slug] || 'center 20%')}
+                        onClick={() => saveImagePosition(tool.id, imagePositions[tool.id] || defaultFocusPoint)}
                         disabled={savingImage === tool.id}
                         className="flex items-center gap-1 rounded-lg bg-primary/10 px-2.5 py-1.5 text-xs font-medium text-primary hover:bg-primary/20 transition-colors disabled:opacity-40"
                       >
@@ -337,7 +295,6 @@ export default function AdminToolsPage() {
                     </div>
                   </div>
 
-                  {/* Ações em massa */}
                   <div className="flex items-center justify-between">
                     <p className="text-xs font-semibold text-on-surface uppercase tracking-wider">Controle de acesso</p>
                     <button
@@ -348,7 +305,6 @@ export default function AdminToolsPage() {
                     </button>
                   </div>
 
-                  {/* Usuários com acesso */}
                   {users.length > 0 && (
                     <div>
                       <p className="text-xs text-on-surface-variant mb-2">
@@ -371,7 +327,6 @@ export default function AdminToolsPage() {
                     </div>
                   )}
 
-                  {/* Usuários sem acesso */}
                   {usersWithout.length > 0 && (
                     <div>
                       <p className="text-xs text-on-surface-variant mb-2">
