@@ -8,6 +8,8 @@ import ValoresPessoaisQuizPage from '../../pages/ValoresPessoaisQuizPage.jsx';
 import ValoresPessoaisReportPage from '../../pages/ValoresPessoaisReportPage.jsx';
 import MetasExecucaoQuizPage from '../../pages/MetasExecucaoQuizPage.jsx';
 import MetasExecucaoReportPage from '../../pages/MetasExecucaoReportPage.jsx';
+import SabotadoresQuizPage from '../../pages/SabotadoresQuizPage.jsx';
+import SabotadoresReportPage from '../../pages/SabotadoresReportPage.jsx';
 
 const assessmentComponents = {
   disc: { Quiz: QuizPage, Report: ReportPage },
@@ -15,6 +17,7 @@ const assessmentComponents = {
   'inteligencia-emocional': { Quiz: InteligenciaEmocionalQuizPage, Report: InteligenciaEmocionalReportPage },
   'valores-pessoais': { Quiz: ValoresPessoaisQuizPage, Report: ValoresPessoaisReportPage },
   'metas-smart': { Quiz: MetasExecucaoQuizPage, Report: MetasExecucaoReportPage },
+  sabotadores: { Quiz: SabotadoresQuizPage, Report: SabotadoresReportPage },
 };
 
 export function getAssessmentComponents(slug) { return assessmentComponents[slug] || null; }
