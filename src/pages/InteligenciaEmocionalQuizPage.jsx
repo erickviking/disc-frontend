@@ -76,15 +76,11 @@ export default function InteligenciaEmocionalQuizPage() {
 
   const submit = async () => {
     if (goToFirstMissing()) return;
-    setSubmitting(true); setError(''); setNotice('Gerando seu relatorio. Isso pode levar alguns segundos.');
+    setSubmitting(true); setError(''); setNotice('Finalizando avaliação. O relatório será gerado em seguida.');
     try {
       await saveResponses(responses);
-      const result = await api.post('/assessments/' + assessmentId + '/submit', { responses });
-      if (result?.assessment?.report?.id) {
-        navigate('/tools/inteligencia-emocional/report/' + assessmentId);
-      } else {
-        navigate('/dashboard/assessments?completed=true');
-      }
+      await api.post('/assessments/' + assessmentId + '/submit', { responses });
+      navigate('/dashboard/ferramenta/inteligencia-emocional?generatingReport=true');
     } catch (e) { setError(e.message); }
     finally { setSubmitting(false); }
   };
@@ -131,14 +127,14 @@ export default function InteligenciaEmocionalQuizPage() {
         )}
 
         <div className="flex items-center justify-between">
-          <button onClick={() => setCurrentIndex(Math.max(0, currentIndex - 1))} disabled={currentIndex === 0} className="btn-secondary gap-1 disabled:opacity-40"><ChevronLeft size={16} />Anterior</button>
-          {currentIndex < questions.length - 1 ? <button onClick={() => setCurrentIndex(currentIndex + 1)} className="btn-primary gap-1">Proxima <ChevronRight size={16} /></button> : <button onClick={submit} disabled={submitting || saving} className="btn-primary gap-2 disabled:opacity-40">{submitting ? <Loader2 size={16} className="animate-spin" /> : <Check size={16} />}Finalizar</button>}
+          <button onClick={() => setCurrentIndex(Math.max(0, currentIndex - 1))} disabled={currentIndex === 0 || submitting} className="btn-secondary gap-1 disabled:opacity-40"><ChevronLeft size={16} />Anterior</button>
+          {currentIndex < questions.length - 1 ? <button onClick={() => setCurrentIndex(currentIndex + 1)} disabled={submitting} className="btn-primary gap-1 disabled:opacity-40">Proxima <ChevronRight size={16} /></button> : <button onClick={submit} disabled={submitting || saving} className="btn-primary gap-2 disabled:opacity-40">{submitting ? <Loader2 size={16} className="animate-spin" /> : <Check size={16} />}Finalizar</button>}
         </div>
 
         <div className="mt-6 flex flex-wrap justify-center gap-1.5">
           {questions.map((q, i) => {
             const done = responses[q.id] !== undefined;
-            return <button key={q.id} onClick={() => setCurrentIndex(i)} className={"h-3 w-3 rounded-full transition-all " + (i === currentIndex ? 'bg-primary scale-125' : done ? 'bg-emerald-400' : 'bg-surface-container-highest hover:bg-outline-variant')} title={'Pergunta ' + (i + 1)} />;
+            return <button key={q.id} onClick={() => setCurrentIndex(i)} disabled={submitting} className={"h-3 w-3 rounded-full transition-all disabled:cursor-not-allowed " + (i === currentIndex ? 'bg-primary scale-125' : done ? 'bg-emerald-400' : 'bg-surface-container-highest hover:bg-outline-variant')} title={'Pergunta ' + (i + 1)} />;
           })}
         </div>
       </div>
