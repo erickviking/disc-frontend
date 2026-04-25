@@ -1,12 +1,11 @@
 import { useParams } from 'react-router-dom';
-import ReportPage from './ReportPage.jsx';
-import RodaDaVidaReportPage from './RodaDaVidaReportPage.jsx';
+import { getAssessmentReportComponent } from '../features/assessments/assessmentRegistry.jsx';
 
 export default function ToolReportEntry() {
   const { slug } = useParams();
+  const ReportComponent = getAssessmentReportComponent(slug);
 
-  if (slug === 'disc') return <ReportPage />;
-  if (slug === 'roda-da-vida') return <RodaDaVidaReportPage />;
+  if (ReportComponent) return <ReportComponent />;
 
   return <div className="card text-center py-16"><p className="text-on-surface-variant">Relatório não disponível para esta ferramenta.</p></div>;
 }
