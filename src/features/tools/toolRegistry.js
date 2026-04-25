@@ -36,10 +36,14 @@ export const toolUiConfig = {
   'inteligencia-emocional': {
     image: '/card-ie.jpg',
     focusPoint: 'center 40%',
+    quizPath: '/tools/inteligencia-emocional/quiz',
+    reportPath: (assessmentId) => '/tools/inteligencia-emocional/report/' + assessmentId,
   },
   'inteligência-emocional': {
     image: '/card-ie.jpg',
     focusPoint: 'center 40%',
+    quizPath: '/tools/inteligencia-emocional/quiz',
+    reportPath: (assessmentId) => '/tools/inteligencia-emocional/report/' + assessmentId,
   },
   'valores-pessoais': {
     image: '/card-valores.jpg',
