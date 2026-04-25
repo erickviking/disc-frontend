@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext.jsx';
 import { api } from '../lib/api.js';
-import { ArrowLeft, ArrowRight, Play, Eye, Clock, CheckCircle2, Target } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Play, Eye, Clock, CheckCircle2, Target, Loader2 } from 'lucide-react';
 import { getToolFocusPoint, getToolIcon, getToolImage, getToolQuizPath, getToolReportPath } from '../features/tools/toolRegistry.js';
 
 const profileNames = { D: 'Executor', I: 'Comunicador', S: 'Planejador', C: 'Analista' };
@@ -14,7 +14,6 @@ const areaLabels = {
   social: 'Social', diversao: 'Diversão', plenitude: 'Plenitude', espiritualidade: 'Espiritualidade',
 };
 
-// Mini Roda SVG for preview
 function MiniRoda({ scores, size = 180 }) {
   const center = size / 2;
   const radius = size / 2 - 30;
@@ -46,29 +45,40 @@ export default function ToolHomePage() {
   const [assessment, setAssessment] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    (async () => {
-      try {
-        const [toolsData, assessData] = await Promise.all([
-          api.get('/tools').catch(() => ({ tools: [] })),
-          api.get('/assessments/mine').catch(() => ({ assessments: [] })),
-        ]);
-        const found = (toolsData.tools || []).find(t => t.slug === slug);
-        setTool(found || null);
-        
-        // Find assessment for this tool
-        const toolAssessment = (assessData.assessments || []).find(a => a.tool?.slug === slug);
-        if (toolAssessment) {
-          setAssessment(toolAssessment);
-        } else if (slug === 'disc') {
-          // Legacy fallback: DISC assessments without tool relation
-          const legacy = (assessData.assessments || []).find(a => a.scoresRaw?.normalized?.D !== undefined && a.status !== 'IN_PROGRESS');
-          if (legacy) setAssessment(legacy);
-        }
-      } catch (e) { console.error(e); }
-      finally { setLoading(false); }
-    })();
+  const loadData = useCallback(async ({ silent = false } = {}) => {
+    try {
+      if (!silent) setLoading(true);
+      const [toolsData, assessData] = await Promise.all([
+        api.get('/tools').catch(() => ({ tools: [] })),
+        api.get('/assessments/mine').catch(() => ({ assessments: [] })),
+      ]);
+      const found = (toolsData.tools || []).find(t => t.slug === slug);
+      setTool(found || null);
+      
+      const toolAssessment = (assessData.assessments || []).find(a => a.tool?.slug === slug);
+      if (toolAssessment) {
+        setAssessment(toolAssessment);
+      } else if (slug === 'disc') {
+        const legacy = (assessData.assessments || []).find(a => a.scoresRaw?.normalized?.D !== undefined && a.status !== 'IN_PROGRESS');
+        if (legacy) setAssessment(legacy);
+      }
+    } catch (e) { console.error(e); }
+    finally { if (!silent) setLoading(false); }
   }, [slug]);
+
+  useEffect(() => { loadData(); }, [loadData]);
+
+  const hasScores = !!assessment?.scoresRaw;
+  const hasReport = !!assessment?.report;
+  const isInProgress = assessment?.status === 'IN_PROGRESS';
+  const isCompleted = hasScores && !isInProgress;
+  const isGeneratingReport = slug === 'inteligencia-emocional' && isCompleted && !hasReport;
+
+  useEffect(() => {
+    if (!isGeneratingReport) return;
+    const intervalId = window.setInterval(() => loadData({ silent: true }), 5000);
+    return () => window.clearInterval(intervalId);
+  }, [isGeneratingReport, loadData]);
 
   if (loading) return (
     <div className="flex items-center justify-center py-20">
@@ -86,21 +96,15 @@ export default function ToolHomePage() {
   const Icon = getToolIcon(tool.icon, Target);
   const bgImage = getToolImage(tool);
   const focusPoint = getToolFocusPoint(tool);
-  const hasScores = !!assessment?.scoresRaw;
-  const hasReport = !!assessment?.report;
-  const isInProgress = assessment?.status === 'IN_PROGRESS';
-  const isCompleted = hasScores && !isInProgress;
   const quizPath = getToolQuizPath(slug);
   const reportPath = getToolReportPath(slug, assessment?.id);
 
   return (
     <div className="space-y-6">
-      {/* Back button */}
       <button onClick={() => navigate('/dashboard')} className="flex items-center gap-1.5 text-xs text-on-surface-variant hover:text-primary transition-colors">
         <ArrowLeft size={14} /> Voltar ao início
       </button>
 
-      {/* Hero */}
       <div className="relative rounded-2xl overflow-hidden border border-outline-variant/20">
         <div className="relative h-56 md:h-64">
           {bgImage && (
@@ -108,7 +112,6 @@ export default function ToolHomePage() {
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-surface from-10% via-surface/80 via-50% to-surface/30" />
           <div className="absolute inset-0 bg-gradient-to-r from-surface/40 via-transparent to-surface/40" />
-          
           <div className="absolute bottom-6 left-6 right-6 z-10">
             <div className="flex items-end justify-between">
               <div>
@@ -126,6 +129,11 @@ export default function ToolHomePage() {
                       <Clock size={12} /> Em andamento
                     </span>
                   )}
+                  {isGeneratingReport && (
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/15 text-amber-400 text-xs font-bold uppercase tracking-widest">
+                      <Loader2 size={12} className="animate-spin" /> Gerando relatório
+                    </span>
+                  )}
                 </div>
                 <h1 className="text-2xl md:text-3xl font-headline font-bold text-on-surface tracking-tight">{tool.name}</h1>
               </div>
@@ -134,17 +142,13 @@ export default function ToolHomePage() {
         </div>
       </div>
 
-      {/* Description + Actions */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Main content */}
         <div className="lg:col-span-2 space-y-6">
-          {/* About */}
           <div className="card">
             <h2 className="font-headline text-lg font-semibold text-on-surface mb-3">Sobre esta ferramenta</h2>
             <p className="text-sm text-on-surface-variant leading-relaxed">{tool.description}</p>
           </div>
 
-          {/* DISC Scores Preview */}
           {slug === 'disc' && isCompleted && assessment?.scoresRaw?.normalized && (
             <div className="card">
               <h2 className="font-headline text-lg font-semibold text-on-surface mb-4">Seu Perfil</h2>
@@ -170,7 +174,6 @@ export default function ToolHomePage() {
             </div>
           )}
 
-          {/* Roda da Vida Scores Preview */}
           {slug === 'roda-da-vida' && isCompleted && assessment?.scoresRaw?.scores && (
             <div className="card">
               <h2 className="font-headline text-lg font-semibold text-on-surface mb-4">Sua Roda</h2>
@@ -189,9 +192,7 @@ export default function ToolHomePage() {
           )}
         </div>
 
-        {/* Sidebar Actions */}
         <div className="space-y-4">
-          {/* Primary Action */}
           <div className="card">
             {!isCompleted && !isInProgress && quizPath && (
               <>
@@ -213,10 +214,20 @@ export default function ToolHomePage() {
               </>
             )}
 
-            {isCompleted && !hasReport && (
+            {isGeneratingReport && (
+              <>
+                <h3 className="font-headline text-base font-semibold text-on-surface mb-2">Gerando relatório</h3>
+                <p className="text-xs text-on-surface-variant mb-4">Sua avaliação foi finalizada. A inteligência artificial está preparando sua devolutiva personalizada.</p>
+                <div className="flex items-center gap-2 rounded-xl bg-amber-500/5 px-4 py-3 text-xs text-amber-400">
+                  <Loader2 size={14} className="animate-spin" /> Atualizando automaticamente
+                </div>
+              </>
+            )}
+
+            {isCompleted && !hasReport && !isGeneratingReport && (
               <>
                 <h3 className="font-headline text-base font-semibold text-on-surface mb-2">Avaliação concluída</h3>
-                <p className="text-xs text-on-surface-variant mb-4">Seu relatório está sendo preparado pela equipe.</p>
+                <p className="text-xs text-on-surface-variant mb-4">Seu relatório está sendo preparado.</p>
                 <div className="flex items-center gap-2 rounded-xl bg-amber-500/5 px-4 py-3 text-xs text-amber-400">
                   <Clock size={14} /> Aguardando relatório
                 </div>
@@ -228,7 +239,7 @@ export default function ToolHomePage() {
                 <h3 className="font-headline text-base font-semibold text-on-surface mb-2">Relatório pronto</h3>
                 <p className="text-xs text-on-surface-variant mb-4">Seu relatório personalizado está disponível.</p>
                 <button onClick={() => navigate(reportPath)} className="btn-primary w-full gap-2">
-                  <Eye size={14} /> Ver relatório completo
+                  <Eye size={14} /> Acessar relatório
                 </button>
               </>
             )}
@@ -241,8 +252,7 @@ export default function ToolHomePage() {
             )}
           </div>
 
-          {/* Refazer */}
-          {isCompleted && quizPath && (
+          {isCompleted && quizPath && !isGeneratingReport && (
             <div className="card">
               <button onClick={() => navigate(quizPath)} className="btn-secondary w-full gap-2 text-xs">
                 <Play size={12} /> Refazer avaliação
