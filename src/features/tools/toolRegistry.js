@@ -9,7 +9,7 @@ export const toolUiConfig = {
   'inteligência-emocional': { image: '/card-ie.jpg', focusPoint: 'center 40%', quizPath: '/tools/inteligencia-emocional/quiz', reportPath: (assessmentId) => '/tools/inteligencia-emocional/report/' + assessmentId },
   'valores-pessoais': { image: '/card-valores.jpg', focusPoint: 'center 45%', quizPath: '/tools/valores-pessoais/quiz', reportPath: (assessmentId) => '/tools/valores-pessoais/report/' + assessmentId },
   'metas-smart': { image: '/card-metas.jpg', focusPoint: 'center 15%', quizPath: '/tools/metas-smart/quiz', reportPath: (assessmentId) => '/tools/metas-smart/report/' + assessmentId },
-  sabotadores: { image: '/card-sabotadores.jpg', focusPoint: 'center 20%' },
+  sabotadores: { image: '/card-sabotadores.jpg', focusPoint: 'center 20%', quizPath: '/tools/sabotadores/quiz', reportPath: (assessmentId) => '/tools/sabotadores/report/' + assessmentId },
   diario: { image: '/card-diario.jpg', focusPoint: 'center 42%' },
   diário: { image: '/card-diario.jpg', focusPoint: 'center 42%' },
 };
