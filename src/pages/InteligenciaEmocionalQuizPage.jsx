@@ -67,7 +67,8 @@ export default function InteligenciaEmocionalQuizPage() {
               <span className="text-sm font-medium text-on-surface-variant">Pergunta {currentIndex + 1} de {questions.length}</span>
               {responses[current.id] && <span className="flex items-center gap-1 text-xs font-medium text-emerald-400"><Check size={14} />Respondida</span>}
             </div>
-            <p className="text-lg font-headline font-semibold text-on-surface leading-relaxed mb-6">{current.text}</p>
+            <p className="text-lg font-headline font-semibold text-on-surface leading-relaxed mb-3">{current.text}</p>
+            {current.helpText && <p className="mb-6 rounded-xl bg-surface-container-high/60 border border-outline-variant/10 px-4 py-3 text-sm text-on-surface-variant leading-relaxed">{current.helpText}</p>}
             <div className="space-y-2">
               {[1, 2, 3, 4, 5].map(value => {
                 const selected = responses[current.id] === value;
