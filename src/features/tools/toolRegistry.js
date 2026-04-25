@@ -24,14 +24,14 @@ export const toolUiConfig = {
   disc: {
     image: '/card-disc.jpg',
     focusPoint: 'center 15%',
-    quizPath: '/quiz',
-    reportPath: (assessmentId) => '/report/' + assessmentId,
+    quizPath: '/tools/disc/quiz',
+    reportPath: (assessmentId) => '/tools/disc/report/' + assessmentId,
   },
   'roda-da-vida': {
     image: '/card-roda.jpg',
     focusPoint: 'center 0%',
-    quizPath: '/roda-da-vida/quiz',
-    reportPath: (assessmentId) => '/roda-da-vida/report/' + assessmentId,
+    quizPath: '/tools/roda-da-vida/quiz',
+    reportPath: (assessmentId) => '/tools/roda-da-vida/report/' + assessmentId,
   },
   'inteligencia-emocional': {
     image: '/card-ie.jpg',

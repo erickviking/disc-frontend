@@ -17,6 +17,8 @@ import ReportPage from './pages/ReportPage.jsx';
 import RodaDaVidaQuizPage from './pages/RodaDaVidaQuizPage.jsx';
 import RodaDaVidaReportPage from './pages/RodaDaVidaReportPage.jsx';
 import ToolHomePage from './pages/ToolHomePage.jsx';
+import ToolQuizEntry from './pages/ToolQuizEntry.jsx';
+import ToolReportEntry from './pages/ToolReportEntry.jsx';
 
 function RootRedirect() {
   const { isAuthenticated, isAdmin, loading } = useAuth();
@@ -33,10 +35,17 @@ export default function App() {
           <Route path="/" element={<RootRedirect />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+
+          {/* Legacy routes kept for backward compatibility */}
           <Route path="/quiz" element={<ProtectedRoute><QuizPage /></ProtectedRoute>} />
           <Route path="/roda-da-vida/quiz" element={<ProtectedRoute><RodaDaVidaQuizPage /></ProtectedRoute>} />
           <Route path="/roda-da-vida/report/:id" element={<ProtectedRoute><RodaDaVidaReportPage /></ProtectedRoute>} />
           <Route path="/report/:id" element={<ProtectedRoute><ReportPage /></ProtectedRoute>} />
+
+          {/* Generic tool routes */}
+          <Route path="/tools/:slug/quiz" element={<ProtectedRoute><ToolQuizEntry /></ProtectedRoute>} />
+          <Route path="/tools/:slug/report/:id" element={<ProtectedRoute><ToolReportEntry /></ProtectedRoute>} />
+
           <Route path="/admin" element={<ProtectedRoute requireAdmin><AppLayout /></ProtectedRoute>}>
             <Route index element={<AdminDashboard />} />
             <Route path="users" element={<AdminUsersPage />} />
