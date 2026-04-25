@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext.jsx';
 import { api } from '../lib/api.js';
-import { Users, ClipboardList, Link2, FileText, ArrowRight, Wrench } from 'lucide-react';
+import { Users, ClipboardList, FileText, ArrowRight, Wrench } from 'lucide-react';
 
 export default function AdminDashboard() {
   const { user } = useAuth();
@@ -13,15 +13,23 @@ export default function AdminDashboard() {
   useEffect(() => {
     (async () => {
       try {
-        const [usersData, assessmentsData, invitesData] = await Promise.all([
+        const [usersData, assessmentsData, invitesData, toolsData] = await Promise.all([
           api.get('/admin/users?limit=1'),
           api.get('/admin/assessments?limit=100'),
           api.get('/admin/invites').catch(() => ({ invites: [] })),
+          api.get('/admin/tools').catch(() => ({ tools: [] })),
         ]);
         const activeInvites = invitesData.invites.filter(i => i.isActive && !i.isExpired && !i.isExhausted).length;
         const reportsCount = assessmentsData.assessments.filter(a => a.report).length;
         const pendingCount = assessmentsData.assessments.filter(a => a.status === 'COMPLETED').length;
-        setStats({ totalUsers: usersData.pagination.total, totalAssessments: assessmentsData.pagination.total, activeInvites, totalReports: reportsCount, pendingRelease: pendingCount });
+        setStats({
+          totalUsers: usersData.pagination.total,
+          totalAssessments: assessmentsData.pagination.total,
+          activeInvites,
+          totalReports: reportsCount,
+          pendingRelease: pendingCount,
+          totalTools: toolsData.tools?.length || 0,
+        });
       } catch (e) { console.error(e); }
       finally { setLoading(false); }
     })();
@@ -33,7 +41,7 @@ export default function AdminDashboard() {
     { label: 'Usuários', value: stats?.totalUsers || 0, icon: Users, img: '/card-roda.jpg', route: '/admin/users', desc: 'Gerenciar usuários e acessos' },
     { label: 'Assessments', value: stats?.totalAssessments || 0, icon: ClipboardList, img: '/card-disc.jpg', route: '/admin/assessments', desc: 'Testes comportamentais realizados' },
     { label: 'Relatórios', value: stats?.totalReports || 0, icon: FileText, img: '/card-ie.jpg', route: '/admin/assessments', desc: 'Relatórios gerados por IA' },
-    { label: 'Ferramentas', value: '7', icon: Wrench, img: '/card-valores.jpg', route: '/admin/tools', desc: 'Gerenciar ferramentas e acesso' },
+    { label: 'Ferramentas', value: stats?.totalTools || 0, icon: Wrench, img: '/card-valores.jpg', route: '/admin/tools', desc: 'Gerenciar ferramentas e acesso' },
   ];
 
   if (loading) return <div className="flex items-center justify-center py-20"><div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"/></div>;

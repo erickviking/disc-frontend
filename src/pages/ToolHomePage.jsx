@@ -2,29 +2,8 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext.jsx';
 import { api } from '../lib/api.js';
-import { ArrowLeft, ArrowRight, Play, Eye, Clock, CheckCircle2, Target, Heart, BookOpen, Shield, Compass, Users, Rocket, Star, Loader2 } from 'lucide-react';
-
-const iconMap = { Users, Target, Heart, Compass, Rocket, Shield, BookOpen, Star };
-
-const cardImages = {
-  'disc': '/card-disc.jpg',
-  'roda-da-vida': '/card-roda.jpg',
-  'inteligencia-emocional': '/card-ie.jpg',
-  'valores-pessoais': '/card-valores.jpg',
-  'metas-smart': '/card-metas.jpg',
-  'sabotadores': '/card-sabotadores.jpg',
-  'diario': '/card-diario.jpg',
-};
-
-const cardFocusPoint = {
-  'disc': 'center 15%',
-  'roda-da-vida': 'center 0%',
-  'inteligencia-emocional': 'center 40%',
-  'valores-pessoais': 'center 45%',
-  'metas-smart': 'center 15%',
-  'sabotadores': 'center 20%',
-  'diario': 'center 42%',
-};
+import { ArrowLeft, ArrowRight, Play, Eye, Clock, CheckCircle2, Target } from 'lucide-react';
+import { getToolFocusPoint, getToolIcon, getToolImage, getToolQuizPath, getToolReportPath } from '../features/tools/toolRegistry.js';
 
 const profileNames = { D: 'Executor', I: 'Comunicador', S: 'Planejador', C: 'Analista' };
 const discColors = { D: '#E63946', I: '#F4A261', S: '#2A9D8F', C: '#264653' };
@@ -104,29 +83,15 @@ export default function ToolHomePage() {
     </div>
   );
 
-  const Icon = iconMap[tool.icon] || Target;
-  const bgImage = cardImages[slug];
-  const focusPoint = cardFocusPoint[slug] || 'center 20%';
+  const Icon = getToolIcon(tool.icon, Target);
+  const bgImage = getToolImage(tool);
+  const focusPoint = getToolFocusPoint(tool);
   const hasScores = !!assessment?.scoresRaw;
   const hasReport = !!assessment?.report;
   const isInProgress = assessment?.status === 'IN_PROGRESS';
   const isCompleted = hasScores && !isInProgress;
-
-  const getQuizPath = () => {
-    if (slug === 'disc') return '/quiz';
-    if (slug === 'roda-da-vida') return '/roda-da-vida/quiz';
-    return null;
-  };
-
-  const getReportPath = () => {
-    if (!assessment) return null;
-    if (slug === 'disc') return '/report/' + assessment.id;
-    if (slug === 'roda-da-vida') return '/roda-da-vida/report/' + assessment.id;
-    return null;
-  };
-
-  const quizPath = getQuizPath();
-  const reportPath = getReportPath();
+  const quizPath = getToolQuizPath(slug);
+  const reportPath = getToolReportPath(slug, assessment?.id);
 
   return (
     <div className="space-y-6">
