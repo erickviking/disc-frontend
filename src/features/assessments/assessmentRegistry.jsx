@@ -6,12 +6,15 @@ import InteligenciaEmocionalQuizPage from '../../pages/InteligenciaEmocionalQuiz
 import InteligenciaEmocionalReportPage from '../../pages/InteligenciaEmocionalReportPage.jsx';
 import ValoresPessoaisQuizPage from '../../pages/ValoresPessoaisQuizPage.jsx';
 import ValoresPessoaisReportPage from '../../pages/ValoresPessoaisReportPage.jsx';
+import MetasExecucaoQuizPage from '../../pages/MetasExecucaoQuizPage.jsx';
+import MetasExecucaoReportPage from '../../pages/MetasExecucaoReportPage.jsx';
 
 const assessmentComponents = {
   disc: { Quiz: QuizPage, Report: ReportPage },
   'roda-da-vida': { Quiz: RodaDaVidaQuizPage, Report: RodaDaVidaReportPage },
   'inteligencia-emocional': { Quiz: InteligenciaEmocionalQuizPage, Report: InteligenciaEmocionalReportPage },
   'valores-pessoais': { Quiz: ValoresPessoaisQuizPage, Report: ValoresPessoaisReportPage },
+  'metas-smart': { Quiz: MetasExecucaoQuizPage, Report: MetasExecucaoReportPage },
 };
 
 export function getAssessmentComponents(slug) { return assessmentComponents[slug] || null; }
