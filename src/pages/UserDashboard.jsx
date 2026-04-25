@@ -2,29 +2,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext.jsx';
 import { api } from '../lib/api.js';
-import { ArrowRight, Lock, CheckCircle2, Clock, Users, Target, Heart, Compass, Rocket, Shield, BookOpen } from 'lucide-react';
-
-const iconMap = { Users, Target, Heart, Compass, Rocket, Shield, BookOpen };
-
-const cardImages = {
-  'disc': '/card-disc.jpg',
-  'roda-da-vida': '/card-roda.jpg',
-  'inteligencia-emocional': '/card-ie.jpg',
-  'valores-pessoais': '/card-valores.jpg',
-  'metas-smart': '/card-metas.jpg',
-  'sabotadores': '/card-sabotadores.jpg',
-  'diario': '/card-diario.jpg',
-};
-
-const cardFocusPoint = {
-  'disc': 'center 15%',
-  'roda-da-vida': 'center 0%',
-  'inteligencia-emocional': 'center 40%',
-  'valores-pessoais': 'center 45%',
-  'metas-smart': 'center 15%',
-  'sabotadores': 'center 20%',
-  'diario': 'center 42%',
-};
+import { ArrowRight, Lock, CheckCircle2, Clock, Target } from 'lucide-react';
+import { getToolFocusPoint, getToolIcon, getToolImage } from '../features/tools/toolRegistry.js';
 
 function getGreeting() {
   const h = new Date().getHours();
@@ -107,9 +86,9 @@ export default function UserDashboard() {
           {tools.map(tool => {
             const status = getStatus(tool);
             const isLocked = status === 'locked';
-            const bgImage = cardImages[tool.slug];
-            const focusPoint = tool.config?.imagePosition || cardFocusPoint[tool.slug] || 'center 20%';
-            const Icon = iconMap[tool.icon] || Target;
+            const bgImage = getToolImage(tool);
+            const focusPoint = getToolFocusPoint(tool);
+            const Icon = getToolIcon(tool.icon, Target);
 
             return (
               <div key={tool.id}
