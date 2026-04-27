@@ -2,8 +2,29 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext.jsx';
 import { api } from '../lib/api.js';
-import { ArrowRight, Lock, CheckCircle2, Clock, Target } from 'lucide-react';
-import { getToolFocusPoint, getToolIcon, getToolImage } from '../features/tools/toolRegistry.js';
+import { ArrowRight, Lock, CheckCircle2, Clock, Users, Target, Heart, Compass, Rocket, Shield, BookOpen } from 'lucide-react';
+
+const iconMap = { Users, Target, Heart, Compass, Rocket, Shield, BookOpen };
+
+const cardImages = {
+  'disc': '/card-disc.jpg',
+  'roda-da-vida': '/card-roda.jpg',
+  'inteligencia-emocional': '/card-ie.jpg',
+  'valores-pessoais': '/card-valores.jpg',
+  'metas-smart': '/card-metas.jpg',
+  'sabotadores': '/card-sabotadores.jpg',
+  'diario': '/card-diario.jpg',
+};
+
+const cardFocusPoint = {
+  'disc': 'center 15%',
+  'roda-da-vida': 'center 0%',
+  'inteligencia-emocional': 'center 40%',
+  'valores-pessoais': 'center 45%',
+  'metas-smart': 'center 15%',
+  'sabotadores': 'center 20%',
+  'diario': 'center 42%',
+};
 
 function getGreeting() {
   const h = new Date().getHours();
@@ -86,14 +107,14 @@ export default function UserDashboard() {
           {tools.map(tool => {
             const status = getStatus(tool);
             const isLocked = status === 'locked';
-            const bgImage = getToolImage(tool);
-            const focusPoint = getToolFocusPoint(tool);
-            const Icon = getToolIcon(tool.icon, Target);
+            const bgImage = cardImages[tool.slug];
+            const focusPoint = tool.config?.imagePosition || cardFocusPoint[tool.slug] || 'center 20%';
+            const Icon = iconMap[tool.icon] || Target;
 
             return (
               <div key={tool.id}
-                className={`group relative flex flex-col rounded-2xl overflow-hidden transition-all duration-300 border ${isLocked ? 'border-outline-variant/10 cursor-pointer' : 'border-outline-variant/20 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 cursor-pointer'}`}
-                onClick={() => isLocked ? window.open('https://pay.hotmart.com/N105573480U?email=' + encodeURIComponent(user?.email || ''), '_blank') : navigate('/dashboard/ferramenta/' + tool.slug)}
+                className={`group relative flex flex-col rounded-2xl overflow-hidden transition-all duration-300 border ${isLocked ? 'border-outline-variant/10 cursor-default' : 'border-outline-variant/20 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 cursor-pointer'}`}
+                onClick={() => !isLocked && navigate('/dashboard/ferramenta/' + tool.slug)}
               >
                 <div className="relative h-48 overflow-hidden bg-surface-container">
                   {bgImage && (
@@ -109,7 +130,7 @@ export default function UserDashboard() {
                         <div className="flex h-12 w-12 items-center justify-center rounded-full bg-surface-container-high/80 backdrop-blur-sm border border-outline-variant/30">
                           <Lock size={20} className="text-on-surface-variant" />
                         </div>
-                        <span className="text-xs font-medium text-on-surface-variant bg-surface-container/80 backdrop-blur-sm px-3 py-1 rounded-full">Desbloquear</span>
+                        <span className="text-xs font-medium text-on-surface-variant bg-surface-container/80 backdrop-blur-sm px-3 py-1 rounded-full">Em breve</span>
                       </div>
                     </div>
                   )}
