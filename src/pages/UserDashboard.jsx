@@ -5,6 +5,8 @@ import { api } from '../lib/api.js';
 import { ArrowRight, Lock, CheckCircle2, Clock, Target } from 'lucide-react';
 import { getToolFocusPoint, getToolIcon, getToolImage } from '../features/tools/toolRegistry.js';
 
+const whatsappSessionUrl = 'https://wa.me/5531989894774?text=' + encodeURIComponent('Olá, Vanessa. Quero solicitar uma sessão de devolutiva para explorar meus resultados.');
+
 function getGreeting() {
   const h = new Date().getHours();
   if (h < 12) return 'Bom dia';
@@ -162,7 +164,7 @@ export default function UserDashboard() {
         <div className="relative max-w-lg">
           <h3 className="font-headline text-xl font-bold text-on-surface">Quer ir mais fundo?</h3>
           <p className="mt-2 text-sm text-on-surface-variant leading-relaxed">Que tal agendar uma sessão de devolutiva para explorar seus resultados?</p>
-          <button className="mt-4 flex items-center gap-2 rounded-xl bg-primary px-6 py-2.5 text-xs font-bold text-on-primary uppercase tracking-widest hover:bg-primary/90 transition-colors shadow-lg">Solicitar sessão <ArrowRight size={14} /></button>
+          <a href={whatsappSessionUrl} target="_blank" rel="noopener noreferrer" className="mt-4 inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-2.5 text-xs font-bold text-on-primary uppercase tracking-widest hover:bg-primary/90 transition-colors shadow-lg">Solicitar sessão <ArrowRight size={14} /></a>
         </div>
         <div className="absolute right-8 bottom-0 hidden lg:block">
           <img src="/vanessa-hero.jpg" alt="" style={{ objectPosition: 'center 15%' }} className="h-52 object-cover opacity-40 mix-blend-luminosity" />
