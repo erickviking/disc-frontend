@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext.jsx';
 import { api } from '../lib/api.js';
 import { ArrowRight, Lock, CheckCircle2, Clock, Target } from 'lucide-react';
 import { getToolFocusPoint, getToolIcon, getToolImage } from '../features/tools/toolRegistry.js';
+import { UpgradeBanner } from '../components/UpgradeBanner.jsx';
 
 function getGreeting() {
   const h = new Date().getHours();
@@ -13,26 +14,28 @@ function getGreeting() {
 }
 
 export default function UserDashboard() {
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   const navigate = useNavigate();
   const [myTools, setMyTools] = useState([]);
   const [allTools, setAllTools] = useState([]);
   const [assessments, setAssessments] = useState([]);
+  const [hasSubscription, setHasSubscription] = useState(false);
   const [loading, setLoading] = useState(true);
   const firstName = (user?.name || '').split(' ')[0] || 'Usuário';
-  const [showBanner, setShowBanner] = useState(true);
 
   useEffect(() => {
     const load = async () => {
       try {
-        const [myData, allData, assessData] = await Promise.all([
+        const [myData, allData, assessData, subData] = await Promise.all([
           api.get('/tools').catch(() => ({ tools: [] })),
           api.get('/tools/all').catch(() => ({ tools: [] })),
           api.get('/assessments/mine').catch(() => ({ assessments: [] })),
+          api.get('/hotmart/status').catch(() => ({ hasSubscription: false })),
         ]);
         setMyTools(myData.tools || []);
         setAllTools(allData.tools || []);
         setAssessments(assessData.assessments || []);
+        setHasSubscription(!!subData.hasSubscription);
       } catch (e) { console.error(e); }
       finally { setLoading(false); }
     };
@@ -80,6 +83,8 @@ export default function UserDashboard() {
           <p className="mt-2 text-sm text-on-surface-variant max-w-md">Explore suas ferramentas de desenvolvimento pessoal e descubra mais sobre você.</p>
         </div>
       </div>
+
+      {!isAdmin && !hasSubscription && <UpgradeBanner userEmail={user?.email} />}
 
       <div>
         <h2 className="font-headline text-lg font-semibold text-on-surface mb-4">Suas ferramentas</h2>
