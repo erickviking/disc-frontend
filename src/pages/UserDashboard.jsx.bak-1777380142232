@@ -20,7 +20,6 @@ export default function UserDashboard() {
   const [assessments, setAssessments] = useState([]);
   const [loading, setLoading] = useState(true);
   const firstName = (user?.name || '').split(' ')[0] || 'Usuário';
-  const [showBanner, setShowBanner] = useState(true);
 
   useEffect(() => {
     const load = async () => {
