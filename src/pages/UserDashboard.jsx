@@ -42,7 +42,7 @@ export default function UserDashboard() {
   const myToolIds = new Set(myTools.map(t => t.id));
   const tools = [
     ...myTools.map(t => ({ ...t, hasAccess: true })),
-    ...allTools.filter(t => !myToolIds.has(t.id)).map(t => ({ ...t, hasAccess: false })),
+    ...allTools.filter(t => !myToolIds.has(t.id) && t.isActive).map(t => ({ ...t, hasAccess: false })),
   ].sort((a, b) => (a.sortOrder || 99) - (b.sortOrder || 99));
 
   const getAssessment = (toolSlug) => {

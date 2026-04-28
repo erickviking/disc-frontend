@@ -13,12 +13,12 @@ const profileNames = { D: 'Executor', I: 'Comunicador', S: 'Planejador', C: 'Ana
 const cardImages = {
   'disc': '/card-disc.jpg', 'roda-da-vida': '/card-roda.jpg', 'inteligencia-emocional': '/card-ie.jpg',
   'valores-pessoais': '/card-valores.jpg', 'metas-smart': '/card-metas.jpg',
-  'sabotadores': '/card-sabotadores.jpg', 'diario': '/card-diario.jpg',
+  'sabotadores': '/card-sabotadores.jpg',
 };
 const cardFocusPoint = {
   'disc': 'center 15%', 'roda-da-vida': 'center 0%', 'inteligencia-emocional': 'center 40%',
   'valores-pessoais': 'center 45%', 'metas-smart': 'center 15%',
-  'sabotadores': 'center 20%', 'diario': 'center 42%',
+  'sabotadores': 'center 20%',
 };
 
 const statusLabels = {
