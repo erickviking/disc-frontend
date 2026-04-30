@@ -49,6 +49,7 @@ export default function App() {
           <Route path="/admin" element={<ProtectedRoute requireAdmin><AppLayout /></ProtectedRoute>}>
             <Route index element={<AdminDashboard />} />
             <Route path="users" element={<AdminUsersPage />} />
+            <Route path="assessments" element={<AdminAssessmentsPage />} />
             <Route path="tools" element={<AdminToolsPage />} />
             <Route path="tools/:slug" element={<AdminToolHomePage />} />
             <Route path="invites" element={<AdminInvitesPage />} />
