@@ -18,7 +18,7 @@ export default function QuizPage() {
       try {
         const [qData, aData] = await Promise.all([
           api.get('/assessments/questions'),
-          api.post('/assessments', {}),
+          api.post('/assessments', { toolSlug: 'disc' }),
         ]);
         setQuestions(qData.questions);
         setAssessmentId(aData.assessment.id);
