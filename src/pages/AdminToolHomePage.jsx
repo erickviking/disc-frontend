@@ -173,7 +173,7 @@ export default function AdminToolHomePage() {
   };
 
   const bulkReleasePending = async () => {
-    if (!confirm('Liberar ' + pendingCount + ' assessment(s) pendente(s) desta ferramenta e disparar geracao de relatorios em background?\n\nEmails serao enviados para os usuarios quando os relatorios ficarem prontos.')) return;
+    if (!confirm('Liberar ' + pendingCount + ' relatorio(s) pendente(s) desta ferramenta?\n\nOs assessments serao marcados como liberados e os relatorios serao gerados em background. Emails serao enviados para os usuarios quando ficarem prontos.')) return;
     setBulkReleasing(true);
     try {
       const r = await api.post('/admin/assessments/bulk-release', { toolSlug: slug });
@@ -250,8 +250,8 @@ export default function AdminToolHomePage() {
             <h2 className="font-headline text-lg font-semibold text-on-surface">Assessments ({assessments.length})</h2>
             {pendingCount > 0 && (
               <button onClick={bulkReleasePending} disabled={bulkReleasing} className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary/15 px-3 py-2 text-xs font-semibold text-primary hover:bg-primary/25 disabled:opacity-50">
-                {bulkReleasing ? <Loader2 size={14} className="animate-spin" /> : <Unlock size={14} />}
-                Liberar {pendingCount} pendente{pendingCount > 1 ? 's' : ''}
+                {bulkReleasing ? <Loader2 size={14} className="animate-spin" /> : <FileText size={14} />}
+                Liberar {pendingCount} relat&oacute;rio{pendingCount > 1 ? 's' : ''} pendente{pendingCount > 1 ? 's' : ''}
               </button>
             )}
           </div>
