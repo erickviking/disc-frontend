@@ -14,7 +14,7 @@ const dimensionLabels = { executor: 'Executor', comunicador: 'Comunicador', plan
 const dimensionOrder = ['executor', 'comunicador', 'planejador', 'analista'];
 
 function RadarChart({ scores }) {
-  const size = 280; const center = size / 2; const radius = 110;
+  const size = 360; const center = size / 2; const radius = 110;
   const factors = ['D', 'I', 'S', 'C'];
   const angles = factors.map((_, i) => (Math.PI * 2 * i) / 4 - Math.PI / 2);
   const getPoint = (angle, value) => ({ x: center + Math.cos(angle) * (radius * value / 100), y: center + Math.sin(angle) * (radius * value / 100) });
