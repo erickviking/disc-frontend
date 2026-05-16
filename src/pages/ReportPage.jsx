@@ -2,9 +2,11 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext.jsx';
 import { api } from '../lib/api.js';
+import { calcularCompetencias, calcularQuadrante, QUADRANTES_LABELS } from '../utils/competencias-disc.js';
 import {
   ArrowLeft, Download, Star, AlertTriangle, MessageCircle, Briefcase,
-  TrendingUp, Users, Loader2, Activity, Layers, Zap, Calendar, Quote, Info
+  TrendingUp, Users, Loader2, Activity, Layers, Zap, Calendar, Quote, Info,
+  Hexagon, Crosshair
 } from 'lucide-react';
 
 const profileNames = { D: 'Executor', I: 'Comunicador', S: 'Planejador', C: 'Analista' };
@@ -26,6 +28,83 @@ function RadarChart({ scores }) {
       {factors.map((_,i)=>{const p=getPoint(angles[i],100);return <line key={i} x1={center} y1={center} x2={p.x} y2={p.y} stroke="rgba(61,56,48,0.5)" strokeWidth="1"/>;})}
       <polygon points={polygon} fill="rgba(212,168,83,0.15)" stroke="#d4a853" strokeWidth="2.5"/>
       {factors.map((f,i)=>{const p=dataPoints[i];const lp=getPoint(angles[i],120);return(<g key={f}><circle cx={p.x} cy={p.y} r="5" fill={profileColors[f]}/><text x={lp.x} y={lp.y} textAnchor="middle" dominantBaseline="middle" fontSize="11" fontWeight="700" fill={profileColors[f]}>{profileNames[f]}</text><text x={lp.x} y={lp.y+14} textAnchor="middle" fontSize="10" fill="#bfb5a8">{scores[f]}%</text></g>);})}
+    </svg>
+  );
+}
+
+function CompetenciasRadar({ competencias }) {
+  const size = 360, center = size / 2, radius = 110, n = competencias.length;
+  const angles = competencias.map((_, i) => (Math.PI * 2 * i) / n - Math.PI / 2);
+  const getPoint = (angle, value) => ({
+    x: center + Math.cos(angle) * (radius * value / 100),
+    y: center + Math.sin(angle) * (radius * value / 100),
+  });
+  const labelDist = 130;
+  const dataPoints = competencias.map((c, i) => getPoint(angles[i], c.score));
+  const polygonPoints = dataPoints.map(p => p.x + ',' + p.y).join(' ');
+
+  return (
+    <svg viewBox={"0 0 " + size + " " + size} className="w-full max-w-[300px] mx-auto">
+      {[25,50,75,100].map(v => (
+        <polygon
+          key={`grid-${v}`}
+          points={angles.map(a => { const p = getPoint(a, v); return p.x + ',' + p.y; }).join(' ')}
+          fill="none"
+          stroke="rgba(61,56,48,0.5)"
+          strokeWidth="1"
+        />
+      ))}
+      {angles.map((a, i) => {
+        const p = getPoint(a, 100);
+        return <line key={`axis-${i}`} x1={center} y1={center} x2={p.x} y2={p.y} stroke="rgba(61,56,48,0.5)" strokeWidth="1"/>;
+      })}
+      <polygon points={polygonPoints} fill="rgba(212,168,83,0.15)" stroke="#d4a853" strokeWidth="2.5"/>
+      {competencias.map((c, i) => {
+        const p = dataPoints[i];
+        const lp = { x: center + Math.cos(angles[i]) * labelDist, y: center + Math.sin(angles[i]) * labelDist };
+        return (
+          <g key={c.key}>
+            <circle cx={p.x} cy={p.y} r="4" fill="#d4a853"/>
+            <text x={lp.x} y={lp.y} textAnchor="middle" dominantBaseline="middle" fontSize="10" fontWeight="600" fill="#bfb5a8">{c.nome}</text>
+            <text x={lp.x} y={lp.y + 12} textAnchor="middle" dominantBaseline="middle" fontSize="9" fill="#bfb5a8">{c.score}</text>
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
+function QuadranteMap({ quadranteData }) {
+  const { x, y, quadranteLabel } = quadranteData;
+  const size = 360, center = size / 2, half = 120;
+  const px = center + x * (half / 100);
+  const py = center - y * (half / 100); // Y do quadrante cresce para CIMA; SVG cresce para BAIXO
+  const qOff = 6;
+
+  return (
+    <svg viewBox={"0 0 " + size + " " + size} className="w-full max-w-[300px] mx-auto">
+      {/* Moldura quadrada */}
+      <rect x={center - half} y={center - half} width={half * 2} height={half * 2} fill="none" stroke="rgba(61,56,48,0.5)" strokeWidth="1"/>
+      {/* Eixos cruzando no centro */}
+      <line x1={center - half} y1={center} x2={center + half} y2={center} stroke="rgba(61,56,48,0.8)" strokeWidth="1"/>
+      <line x1={center} y1={center - half} x2={center} y2={center + half} stroke="rgba(61,56,48,0.8)" strokeWidth="1"/>
+      {/* Labels das pontas dos eixos */}
+      <text x={center + half + 12} y={center} textAnchor="start" dominantBaseline="middle" fontSize="9" fontWeight="700" fill="#bfb5a8">+D</text>
+      <text x={center - half - 12} y={center} textAnchor="end" dominantBaseline="middle" fontSize="9" fontWeight="700" fill="#bfb5a8">-S</text>
+      <text x={center} y={center - half - 12} textAnchor="middle" fontSize="9" fontWeight="700" fill="#bfb5a8">+I</text>
+      <text x={center} y={center + half + 12} textAnchor="middle" dominantBaseline="hanging" fontSize="9" fontWeight="700" fill="#bfb5a8">-C</text>
+      {/* Labels dos 4 quadrantes nos cantos internos */}
+      <text x={center + half - qOff} y={center - half + qOff} textAnchor="end" dominantBaseline="hanging" fontSize="9" fill="#bfb5a8">{QUADRANTES_LABELS.Q1}</text>
+      <text x={center - half + qOff} y={center - half + qOff} textAnchor="start" dominantBaseline="hanging" fontSize="9" fill="#bfb5a8">{QUADRANTES_LABELS.Q2}</text>
+      <text x={center - half + qOff} y={center + half - qOff} textAnchor="start" fontSize="9" fill="#bfb5a8">{QUADRANTES_LABELS.Q3}</text>
+      <text x={center + half - qOff} y={center + half - qOff} textAnchor="end" fontSize="9" fill="#bfb5a8">{QUADRANTES_LABELS.Q4}</text>
+      {/* Linhas pontilhadas do ponto até os eixos */}
+      <line x1={px} y1={py} x2={center} y2={py} stroke="rgba(212,168,83,0.4)" strokeWidth="1" strokeDasharray="2,2"/>
+      <line x1={px} y1={py} x2={px} y2={center} stroke="rgba(212,168,83,0.4)" strokeWidth="1" strokeDasharray="2,2"/>
+      {/* Ponto da pessoa */}
+      <circle cx={px} cy={py} r="8" fill="#d4a853" stroke="#3D3830" strokeWidth="2"/>
+      {/* Nome do quadrante centralizado abaixo da moldura */}
+      <text x={center} y={center + half + 28} textAnchor="middle" dominantBaseline="middle" fontSize="11" fontWeight="700" fill="#d4a853">{quadranteLabel}</text>
     </svg>
   );
 }
@@ -83,6 +162,9 @@ export default function ReportPage() {
     ? []
     : [...n.planoDeDesenvolvimento30Dias].sort((a, b) => a.semana - b.semana);
 
+  const competencias = isLegacyShape ? [] : calcularCompetencias(scores);
+  const quadranteData = isLegacyShape ? null : calcularQuadrante(scores);
+
   return (
     <div className="min-h-screen bg-surface">
       <div className="mx-auto max-w-3xl px-4 py-8">
@@ -114,6 +196,21 @@ export default function ReportPage() {
 
         {!isLegacyShape && (
           <>
+            <div className="card mb-6">
+              <Section icon={Hexagon} title="Radar de Competências" color="text-primary bg-primary/15">
+                <CompetenciasRadar competencias={competencias}/>
+                <p className="text-xs italic text-on-surface-variant text-center mt-2">
+                  Competências derivadas a partir das 4 dimensões DISC. Modelo de mapeamento baseado em literatura comportamental.
+                </p>
+              </Section>
+            </div>
+
+            <div className="card mb-6">
+              <Section icon={Crosshair} title="Mapa de Quadrantes" color="text-primary bg-primary/15">
+                <QuadranteMap quadranteData={quadranteData}/>
+              </Section>
+            </div>
+
             <div className="card mb-6"><h2 className="font-headline text-xl font-semibold text-on-surface mb-3">Resumo do Perfil</h2><p className="text-sm leading-relaxed text-on-surface-variant whitespace-pre-line">{n.resumoExecutivo}</p></div>
 
             <div className="card mb-6"><Section icon={Activity} title="Leitura Central" color="text-primary bg-primary/15"><p className="text-sm leading-relaxed text-on-surface-variant whitespace-pre-line">{n.leituraCentral}</p></Section></div>
